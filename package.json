@@ -1,0 +1,16 @@
+{
+  "name": "mvp-tdah-dialogflow-python",
+  "version": "0.1.0",
+  "description": "Chatbot de Apoio à Saúde Mental (MVP)",
+  "scripts": {
+    "version:patch": "python3 ops/version_manager.py patch",
+    "version:minor": "python3 ops/version_manager.py minor",
+    "version:major": "python3 ops/version_manager.py major"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devjogerio/mvp-tdah-dialogflow-python-ia.git"
+  },
+  "author": "Dev Rogerio",
+  "license": "MIT"
+}

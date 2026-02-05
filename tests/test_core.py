@@ -2,22 +2,30 @@ import pytest
 from unittest.mock import MagicMock, patch
 from src.core.bedrock_integration import BedrockService
 
+
 @pytest.fixture
 def mock_boto3():
     with patch("boto3.client") as mock:
         yield mock
 
+
 def test_bedrock_init(mock_boto3):
     """Testa inicialização do serviço."""
     service = BedrockService()
     assert service.model_id == "meta.llama3-8b-instruct-v1:0"
-    mock_boto3.assert_called_once_with(service_name="bedrock-runtime", region_name="us-east-1")
+    mock_boto3.assert_called_once_with(
+        service_name="bedrock-runtime", region_name="us-east-1")
+
 
 def test_retrieve_context():
     """Testa retrieval (mockado por enquanto)."""
     service = BedrockService()
+    # Mock do opensearch_service para não precisar de credenciais
+    service.opensearch_service = None
+
     context = service.retrieve_context("query")
     assert "TDAH" in context
+
 
 def test_invoke_model_success(mock_boto3):
     """Testa invocação do modelo com sucesso."""
@@ -29,6 +37,6 @@ def test_invoke_model_success(mock_boto3):
 
     service = BedrockService()
     response = service.invoke_model("prompt", "context")
-    
+
     assert response == "Resposta gerada"
     mock_client.invoke_model.assert_called_once()
