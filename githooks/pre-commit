@@ -1,0 +1,17 @@
+#!/bin/sh
+# pre-commit hook to validate version consistency
+
+echo "Validating version consistency..."
+
+VERSION_TXT=$(cat version.txt)
+PACKAGE_JSON=$(grep '"version":' package.json | awk -F '"' '{print $4}')
+
+if [ "$VERSION_TXT" != "$PACKAGE_JSON" ]; then
+    echo "Error: Version mismatch!"
+    echo "version.txt: $VERSION_TXT"
+    echo "package.json: $PACKAGE_JSON"
+    exit 1
+fi
+
+echo "Version consistency check passed ($VERSION_TXT)."
+exit 0

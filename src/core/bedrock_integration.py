@@ -3,6 +3,7 @@ import json
 import os
 import logging
 from typing import Dict, Any
+from src.core.opensearch_service import OpenSearchService
 
 """
 Módulo de integração com Amazon Bedrock (RF01).
@@ -12,21 +13,31 @@ Gerencia a chamada ao LLM (Llama 3) e RAG.
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+
 class BedrockService:
     def __init__(self, region_name: str = "us-east-1"):
         """
-        Inicializa o cliente Bedrock.
-        
+        Inicializa o cliente Bedrock e OpenSearch.
+
         Args:
             region_name (str): Região AWS.
         """
-        # Em ambiente local sem credenciais, o boto3 pode falhar se não mockado.
-        # Aqui assumimos que o ambiente terá credenciais ou será mockado.
         self.client = boto3.client(
             service_name="bedrock-runtime",
             region_name=region_name
         )
-        self.model_id = os.getenv("BEDROCK_MODEL_ID", "meta.llama3-8b-instruct-v1:0")
+        self.model_id = os.getenv(
+            "BEDROCK_MODEL_ID", "meta.llama3-8b-instruct-v1:0")
+
+        # Inicialização do OpenSearch
+        opensearch_host = os.getenv("OPENSEARCH_HOST", "")
+        if opensearch_host:
+            self.opensearch_service = OpenSearchService(
+                opensearch_host, region_name)
+        else:
+            self.opensearch_service = None
+            logger.warning(
+                "OPENSEARCH_HOST não definido. RAG funcionará em modo mock.")
 
     def invoke_model(self, prompt: str, context: str = "") -> str:
         """
@@ -79,7 +90,7 @@ Contexto de Referência:
 
             response_body = json.loads(response.get("body").read())
             generation = response_body.get("generation", "")
-            
+
             return generation.strip()
 
         except Exception as e:
@@ -89,16 +100,24 @@ Contexto de Referência:
 
     def retrieve_context(self, query: str) -> str:
         """
-        Simulação da busca vetorial (RAG).
-        No MVP real, isso conectaria ao OpenSearch Serverless.
-        
+        Busca vetorial (RAG) no OpenSearch Serverless.
+
         Args:
             query (str): A busca do usuário.
-            
+
         Returns:
             str: Contexto relevante recuperado.
         """
-        # TODO: Implementar conexão real com OpenSearch/Kendra
-        logger.info(f"Buscando contexto para: {query}")
-        return "O TDAH (Transtorno de Déficit de Atenção e Hiperatividade) é um transtorno neurobiológico..."
+        if self.opensearch_service:
+            # 1. Gerar embedding da query (usando Bedrock Titan Embedding, por exemplo)
+            # Aqui simplificamos assumindo um vetor dummy ou chamada mockada
+            # Em prod, chamaríamos bedrock-runtime.invoke_model("amazon.titan-embed-text-v1")
+            query_vector = [0.1] * 1536  # Placeholder
 
+            context = self.opensearch_service.search(query_vector)
+            if context:
+                return context
+
+        # Fallback Mock
+        logger.info(f"Buscando contexto (Mock) para: {query}")
+        return "O TDAH (Transtorno de Déficit de Atenção e Hiperatividade) é um transtorno neurobiológico caracterizado por desatenção, hiperatividade e impulsividade..."

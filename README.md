@@ -76,9 +76,39 @@ Execute os testes unitários para validar a instalação:
 pytest tests/
 ```
 
+## ⚙️ Automação e Deploy (Ops)
+
+O projeto conta com uma ferramenta CLI para gerenciar testes, validação de infraestrutura e deploy.
+
+### Uso do `deploy_manager.py`
+
+O script `ops/deploy_manager.py` orquestra o pipeline de desenvolvimento.
+
+```bash
+# Executar validação completa e simular deploy em ambiente de desenvolvimento
+python3 ops/deploy_manager.py --env dev
+
+# Pular testes unitários
+python3 ops/deploy_manager.py --env dev --skip-tests
+
+# Simular deploy em produção
+python3 ops/deploy_manager.py --env prod
+```
+
+O script gera logs detalhados em `deploy.log` e um relatório JSON ao final de cada execução.
+
+## 🏗️ Infraestrutura como Código (IaC)
+
+A infraestrutura AWS é gerenciada via Terraform na pasta `infra/`.
+
+### Recursos Provisionados
+- **S3**: Bucket para Knowledge Base (`infra/modules/storage`).
+- **OpenSearch Serverless**: Coleção vetorial (`infra/modules/search`).
+- **Lambda**: Função principal do Chatbot (`infra/modules/compute`).
+
 ## 📦 Deploy
 
-O deploy é realizado via GitHub Actions (CI/CD) ou manualmente via AWS CLI/Terraform (detalhes na pasta `infra/`).
+O deploy é realizado via GitHub Actions (CI/CD) configurado em `.github/workflows/ci-cd.yml` ou manualmente via `deploy_manager.py`.
 
 ## 🤝 Contribuição
 
