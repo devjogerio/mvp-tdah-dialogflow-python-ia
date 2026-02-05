@@ -1,4 +1,10 @@
-# Ignore JSON key files
+./key.json # Ignore JSON key files
 *.json
 !src/dialogflow/data/*.json
 !package.json
+
+# Ignore all .md files 
+*.md 
+
+# Except README.md 
+!README.md 
