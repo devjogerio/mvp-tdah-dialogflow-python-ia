@@ -6,10 +6,6 @@
 
 Este PR implementa a arquitetura técnica completa para integração e automação do Dialogflow ES, permitindo o gerenciamento de Intents, Entidades e Contextos via código e arquivos de configuração JSON. A solução visa eliminar configurações manuais na interface do Dialogflow e garantir versionamento da lógica conversacional.
 
-### 🔗 Issue Relacionada
-
-Closes # (insira o número da issue se houver)
-
 ## 🛠️ Mudanças Realizadas
 
 ### 1. Módulo de Automação (`src/dialogflow/manager.py`)
@@ -29,11 +25,13 @@ Closes # (insira o número da issue se houver)
   - `entities`: Definições de entidades (ex: Emotion) e seus valores.
 
 ### 3. Configuração e Dependências
+
 - Adicionado `google-cloud-dialogflow` ao `requirements.txt`.
 - Atualizado `README.md` com instruções de setup de credenciais GCP e execução da automação.
 - **Gitignore Atualizado**: Adicionada regra para ignorar todos os arquivos `.md` exceto `README.md` (e este próprio arquivo se já rastreado), mantendo a documentação limpa.
 
 ### 4. Testes
+
 - Criados testes unitários em `tests/test_dialogflow.py` utilizando `unittest.mock` para simular chamadas à API do Google, garantindo que o código funcione sem credenciais reais durante o CI.
 
 ## 📸 Demonstração
