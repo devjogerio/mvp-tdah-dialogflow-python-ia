@@ -11,13 +11,14 @@ O objetivo é oferecer apoio psicoeducativo, triagem inteligente e uma interface
 - **Triagem de Crise**: Identificação de riscos e direcionamento para ajuda (CVV).
 - **RAG**: Respostas fundamentadas em base de conhecimento clínica.
 - **Segurança**: Filtros para prevenção de conteúdo nocivo.
+- **Integração Dialogflow**: Automação completa de Intents, Entidades e Contextos.
 
 ## 🚀 Tecnologias
 
 - **Linguagem**: Python 3.9+
-- **Cloud**: AWS (Lambda, Bedrock, OpenSearch, S3)
+- **Cloud**: AWS (Lambda, Bedrock, OpenSearch, S3), GCP (Dialogflow ES)
 - **IA/LLM**: Meta Llama 3 (via Bedrock)
-- **Frameworks**: Boto3, LangChain
+- **Frameworks**: Boto3, LangChain, google-cloud-dialogflow
 
 ## 📂 Estrutura do Projeto
 
@@ -26,6 +27,9 @@ chatbot-saude-mental/
 ├── infra/            # Scripts de Infraestrutura (Terraform/CDK)
 ├── src/              # Código Fonte
 │   ├── core/         # Lógica de Integração com Bedrock e RAG
+│   ├── dialogflow/   # Automação e Gerenciamento do Dialogflow
+│   │   ├── data/     # Definições JSON de Intents/Entidades
+│   │   └── manager.py # Script de Automação
 │   ├── utils/        # Utilitários e Filtros de Segurança
 │   └── lambda_function.py # Entrypoint da AWS Lambda
 ├── data/             # Base de Conhecimento (Docs)
@@ -38,6 +42,7 @@ chatbot-saude-mental/
 ### Pré-requisitos
 - Python 3.9 ou superior
 - Conta AWS com permissões para Bedrock e Lambda
+- Conta Google Cloud com Dialogflow API ativada
 - Git
 
 ### Instalação
@@ -66,7 +71,7 @@ chatbot-saude-mental/
      ```bash
      cp .env.example .env
      ```
-   - Preencha o `.env` com suas credenciais AWS.
+   - Preencha o `.env` com suas credenciais AWS e GCP (`GOOGLE_APPLICATION_CREDENTIALS`).
 
 ## 🧪 Testes
 
@@ -76,18 +81,40 @@ Execute os testes unitários para validar a instalação:
 pytest tests/
 ```
 
-## 📦 Deploy
+## 🤖 Automação Dialogflow
 
-O deploy é realizado via GitHub Actions (CI/CD) ou manualmente via AWS CLI/Terraform (detalhes na pasta `infra/`).
+O projeto inclui um gerenciador automatizado para sincronizar Intents e Entidades com o Dialogflow ES.
 
-## 🤝 Contribuição
+### Configuração
+1. Baixe a chave de serviço (JSON) do GCP.
+2. Configure `GOOGLE_APPLICATION_CREDENTIALS` no `.env`.
+3. Defina as intents em `src/dialogflow/data/initial_config.json`.
 
-1. Faça um Fork do projeto
-2. Crie uma Branch para sua Feature (`git checkout -b feature/IncrivelFeature`)
-3. Faça o Commit (`git commit -m 'Add some IncrivelFeature'`)
-4. Faça o Push (`git push origin feature/IncrivelFeature`)
-5. Abra um Pull Request
+### Execução
+```bash
+# Sincronizar configuração local com a nuvem
+python3 src/dialogflow/manager.py
+```
 
-## 📄 Licença
+## ⚙️ Automação e Deploy (Ops)
 
-Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
+O projeto conta com uma ferramenta CLI para gerenciar testes, validação de infraestrutura e deploy.
+
+### Uso do `deploy_manager.py`
+
+O script `ops/deploy_manager.py` orquestra o pipeline de desenvolvimento.
+
+```bash
+# Executar validação completa e simular deploy em ambiente de desenvolvimento
+python3 ops/deploy_manager.py --env dev
+
+# Pular testes unitários
+python3 ops/deploy_manager.py --env dev --skip-tests
+
+# Simular deploy em produção
+python3 ops/deploy_manager.py --env prod
+```
+
+O script gera logs detalhados em `deploy.log` e um relatório JSON ao final de cada execução.
+
+## 🏗️ Infraestrutura como Código (IaC)

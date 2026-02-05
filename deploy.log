@@ -1,0 +1,59 @@
+2026-02-05 18:54:51,995 - INFO - >>> Iniciando etapa: Check Python
+2026-02-05 18:54:52,030 - INFO - Saída: Python 3.14.2
+2026-02-05 18:54:52,031 - INFO - <<< Etapa Check Python concluída (SUCCESS) em 0.04s
+
+2026-02-05 18:54:52,031 - INFO - >>> Iniciando etapa: Check Terraform
+2026-02-05 18:54:52,045 - ERROR - Erro na etapa Check Terraform: /bin/sh: terraform: command not found
+
+2026-02-05 18:54:52,046 - INFO - <<< Etapa Check Terraform concluída (FAILED) em 0.02s
+
+2026-02-05 18:54:52,046 - INFO - >>> Iniciando etapa: Unit Tests
+2026-02-05 18:54:53,741 - INFO - Saída: ============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-7.4.0, pluggy-1.6.0
+rootdir: /Volumes/NVMe-256GB/projeto-mvp-tdah-dialogflow-python
+plugins: anyio-4.12.1
+collected 11 items
+
+tests/test_core.py ...                                                   [ 27%]
+tests/test_lambda.py ..                                                  [ 45%]
+tests/test_opensearch.py ...                                             [ 72%]
+tests/test_safety.py ...                                                 [100%]
+
+============================== 11 passed in 0.98s ==============================
+2026-02-05 18:54:53,741 - INFO - <<< Etapa Unit Tests concluída (SUCCESS) em 1.70s
+
+2026-02-05 18:54:53,742 - INFO - >>> Iniciando etapa: Terraform Init
+2026-02-05 18:54:53,755 - ERROR - Erro na etapa Terraform Init: /bin/sh: terraform: command not found
+
+2026-02-05 18:54:53,755 - CRITICAL - Processo abortado devido a erro crítico: Command 'terraform init -backend=false' returned non-zero exit status 127.
+2026-02-05 18:54:53,758 - INFO - Relatório gerado em: deploy_report_dev_1770328493.json
+2026-02-05 18:55:34,596 - INFO - >>> Iniciando etapa: Check Python
+2026-02-05 18:55:34,647 - INFO - Saída: Python 3.14.2
+2026-02-05 18:55:34,648 - INFO - <<< Etapa Check Python concluída (SUCCESS) em 0.05s
+
+2026-02-05 18:55:34,648 - INFO - >>> Iniciando etapa: Check Terraform
+2026-02-05 18:55:34,663 - ERROR - Erro na etapa Check Terraform: /bin/sh: terraform: command not found
+
+2026-02-05 18:55:34,664 - WARNING - Terraform não encontrado. Etapas de infraestrutura serão puladas.
+2026-02-05 18:55:34,664 - INFO - >>> Iniciando etapa: Unit Tests
+2026-02-05 18:55:41,480 - INFO - Saída: ============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-7.4.0, pluggy-1.6.0
+rootdir: /Volumes/NVMe-256GB/projeto-mvp-tdah-dialogflow-python
+plugins: anyio-4.12.1
+collected 11 items
+
+tests/test_core.py ...                                                   [ 27%]
+tests/test_lambda.py ..                                                  [ 45%]
+tests/test_opensearch.py ...                                             [ 72%]
+tests/test_safety.py ...                                                 [100%]
+
+============================== 11 passed in 5.89s ==============================
+2026-02-05 18:55:41,480 - INFO - <<< Etapa Unit Tests concluída (SUCCESS) em 6.82s
+
+2026-02-05 18:55:41,480 - INFO - Pulando validação de infra (Terraform não detectado).
+2026-02-05 18:55:41,480 - INFO - Simulando deploy para ambiente: dev
+2026-02-05 18:55:41,480 - INFO - >>> Iniciando etapa: Deploy Simulation
+2026-02-05 18:55:41,493 - INFO - Saída: Deploying resources...
+2026-02-05 18:55:41,493 - INFO - <<< Etapa Deploy Simulation concluída (SUCCESS) em 0.01s
+
+2026-02-05 18:55:41,496 - INFO - Relatório gerado em: deploy_report_dev_1770328541.json
