@@ -73,6 +73,44 @@ chatbot-saude-mental/
      ```
    - Preencha o `.env` com suas credenciais AWS e GCP (`GOOGLE_APPLICATION_CREDENTIALS`).
 
+## 🐳 Execução via Docker (Desenvolvimento Local)
+
+O projeto conta com um ambiente Docker completo para facilitar o desenvolvimento local, simulando a infraestrutura AWS (OpenSearch) e encapsulando a Lambda em uma API REST local.
+
+### Pré-requisitos
+- Docker e Docker Compose instalados.
+
+### Como Executar
+
+1. **Configurar Variáveis**:
+   Certifique-se de que o arquivo `.env` existe e contém suas credenciais AWS (necessárias para acessar o Bedrock na nuvem, já que ele não é mockado localmente):
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Iniciar o Ambiente**:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Acessar Serviços**:
+   - **API (Chatbot)**: http://localhost:8000/docs (Swagger UI)
+   - **OpenSearch Dashboards**: http://localhost:5601
+   - **OpenSearch API**: https://localhost:9200 (User: `admin`, Pass: `AdminStrongPass123!`)
+
+### Detalhes da Estrutura Docker
+- **app**: Container Python rodando a lógica da Lambda via FastAPI (hot-reload ativado).
+- **opensearch**: Nó único do OpenSearch para RAG local.
+- **opensearch-dashboards**: Interface visual para inspecionar índices e vetores.
+
+### Testando o Chatbot Localmente
+Envie uma requisição POST para `http://localhost:8000/chat` ou use o Swagger UI:
+```json
+{
+  "message": "Como lidar com a ansiedade?"
+}
+```
+
 ## 🧪 Testes
 
 Execute os testes unitários para validar a instalação:

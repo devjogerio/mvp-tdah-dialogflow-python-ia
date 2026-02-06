@@ -6,23 +6,39 @@ from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
 
+
 class OpenSearchService:
     def __init__(self, host: str, region: str = "us-east-1"):
-        self.host = host.replace("https://", "")
+        self.host = host.replace("https://", "").replace("http://", "")
         self.region = region
-        
-        credentials = boto3.Session().get_credentials()
-        # Fallback seguro para mock/testes sem credenciais
-        if credentials:
-            auth = AWSV4SignerAuth(credentials, region, 'aoss')
+
+        # Configuração flexível para ambiente local (Docker) vs AWS
+        is_local = os.environ.get("IS_LOCAL", "false").lower() == "true"
+
+        if is_local:
+            logger.info("Inicializando OpenSearch em modo LOCAL")
+            auth = (os.environ.get("OPENSEARCH_USER", "admin"),
+                    os.environ.get("OPENSEARCH_PASSWORD", "admin"))
+            port = int(os.environ.get("OPENSEARCH_PORT", 9200))
+            use_ssl = os.environ.get(
+                "OPENSEARCH_USE_SSL", "false").lower() == "true"
+            verify_certs = False
         else:
-            auth = ('admin', 'admin') # Mock apenas para testes locais fora da AWS
+            credentials = boto3.Session().get_credentials()
+            if credentials:
+                auth = AWSV4SignerAuth(credentials, region, 'aoss')
+            else:
+                auth = ('admin', 'admin')  # Fallback
+
+            port = 443
+            use_ssl = True
+            verify_certs = True
 
         self.client = OpenSearch(
-            hosts=[{'host': self.host, 'port': 443}],
+            hosts=[{'host': self.host, 'port': port}],
             http_auth=auth,
-            use_ssl=True,
-            verify_certs=True,
+            use_ssl=use_ssl,
+            verify_certs=verify_certs,
             connection_class=RequestsHttpConnection,
             pool_maxsize=20
         )
@@ -44,16 +60,16 @@ class OpenSearchService:
                     }
                 }
             }
-            
+
             response = self.client.search(
                 body=body,
                 index=self.index_name
             )
-            
+
             hits = response['hits']['hits']
             context = "\n".join([hit['_source']['text'] for hit in hits])
             return context
-            
+
         except Exception as e:
             logger.error(f"Erro na busca OpenSearch: {str(e)}")
             return ""
