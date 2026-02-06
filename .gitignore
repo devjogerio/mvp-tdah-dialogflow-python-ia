@@ -92,5 +92,4 @@ credentials.json
 client_secret.json
 
 # --- Documentation Rules ---
-docs/
-
+/docs/
