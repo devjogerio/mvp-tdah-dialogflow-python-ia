@@ -1,7 +1,7 @@
 {
   "name": "mvp-tdah-dialogflow-python",
-  "version": "0.1.0",
-  "description": "Chatbot de Apoio à Saúde Mental (MVP)",
+  "version": "0.2.0",
+  "description": "Chatbot de Apoio \u00e0 Sa\u00fade Mental (MVP)",
   "scripts": {
     "version:patch": "python3 ops/version_manager.py patch",
     "version:minor": "python3 ops/version_manager.py minor",

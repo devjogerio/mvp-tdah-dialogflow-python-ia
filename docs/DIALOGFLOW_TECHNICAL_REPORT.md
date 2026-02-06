@@ -1,8 +1,8 @@
 # Relatório Técnico: Ecossistema Dialogflow & Integração AWS Lambda
 
 **Data:** 06/02/2026  
-**Autor:** Trae AI Assistant  
-**Status:** Implementado e Validado  
+**Autor:** Rogério Assunção  
+**Status:** Implementado e Validado
 
 ---
 
@@ -10,22 +10,26 @@
 
 ### 1.1 Bugs Identificados
 
-| ID | Componente | Descrição do Problema | Severidade | Causa Raiz | Solução Implementada |
-|:---|:---|:---|:---|:---|:---|
-| **BUG-01** | `lambda_function.py` | Incompatibilidade de Payload | Crítica | O handler esperava JSON simples (`{"message": "..."}`), mas o Dialogflow envia `WebhookRequest` complexo. | Implementação do padrão **Adapter** para normalizar entradas de ambas as fontes. |
-| **BUG-02** | `lambda_function.py` | Perda de Contexto | Alta | O `session_id` era ignorado, tornando o bot *stateless* e incapaz de manter conversas. | Extração e log do `session_id` no Adapter para futura persistência. |
-| **BUG-03** | `manager.py` | Falha de Sincronização | Média | O script apenas criava novos recursos. Alterações em Intents existentes eram ignoradas (`AlreadyExists`). | Implementação de lógica **UPSERT** (Update if Exists, Create if New) para Intents e Entities. |
+| ID         | Componente           | Descrição do Problema        | Severidade | Causa Raiz                                                                                                | Solução Implementada                                                                          |
+| :--------- | :------------------- | :--------------------------- | :--------- | :-------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| **BUG-01** | `lambda_function.py` | Incompatibilidade de Payload | Crítica    | O handler esperava JSON simples (`{"message": "..."}`), mas o Dialogflow envia `WebhookRequest` complexo. | Implementação do padrão **Adapter** para normalizar entradas de ambas as fontes.              |
+| **BUG-02** | `lambda_function.py` | Perda de Contexto            | Alta       | O `session_id` era ignorado, tornando o bot _stateless_ e incapaz de manter conversas.                    | Extração e log do `session_id` no Adapter para futura persistência.                           |
+| **BUG-03** | `manager.py`         | Falha de Sincronização       | Média      | O script apenas criava novos recursos. Alterações em Intents existentes eram ignoradas (`AlreadyExists`). | Implementação de lógica **UPSERT** (Update if Exists, Create if New) para Intents e Entities. |
 
 ### 1.2 Detalhamento das Correções
 
 #### A. Dialogflow Adapter (`src/dialogflow/adapter.py`)
+
 Criado um módulo intermediário que:
+
 1.  Detecta automaticamente a origem da requisição (Dialogflow vs API Gateway).
 2.  Extrai `user_message` de `queryResult.queryText` ou `body.message`.
 3.  Formata a resposta no padrão `WebhookResponse` (`fulfillmentText`) para o Dialogflow.
 
 #### B. Atualização do Manager (`src/dialogflow/manager.py`)
+
 Refatorado para suportar Ciclo de Vida Completo:
+
 - **Intents:** Busca por `display_name` e executa `update_intent` se já existir.
 - **Entities:** Atualiza tipos e executa `batch_update_entities` para sinônimos.
 
@@ -46,12 +50,14 @@ Refatorado para suportar Ciclo de Vida Completo:
 **Novas Dependências:** Nenhuma biblioteca externa adicionada. Utiliza apenas `json` e `logging` nativos, mantendo a Lambda leve.
 
 **Variáveis de Ambiente Necessárias:**
+
 - `GCP_PROJECT_ID`: ID do projeto no Google Cloud (para o Manager).
 - `GOOGLE_APPLICATION_CREDENTIALS`: Caminho para chave JSON (para execução local do Manager).
 
 ### 2.3 Instruções de Deploy
 
 1.  **Build & Package:**
+
     ```bash
     # O deploy é gerenciado via AWS CDK, mas para atualizar apenas o código:
     zip -r lambda_package.zip src/
@@ -96,19 +102,23 @@ O bot opera em um modelo **Híbrido (Intents + Generativo)**:
 A configuração é mantida em `src/dialogflow/data/initial_config.json`.
 
 **Intents Principais:**
+
 - `Default Welcome Intent`: Saudação inicial.
 - `Default Fallback Intent`: **[CRÍTICO]** Deve estar habilitada para Fulfillment via Webhook.
 
 **Entities:**
+
 - `TDAH_Keywords`: Termos técnicos para auxiliar na classificação (opcional, foco no RAG).
 
 ### 3.4 Métricas e Monitoramento
 
 **Logs:**
+
 - Todos os eventos são logados no CloudWatch com `session_id` para rastreabilidade.
 - Erros de segurança são flaggados como `risk_detected: True`.
 
 **Performance:**
+
 - Tempo médio de resposta esperado (RAG): 2-4 segundos.
 - Timeout do Dialogflow: 5 segundos. (Risco de Latência: Alto. Recomenda-se cache).
 
