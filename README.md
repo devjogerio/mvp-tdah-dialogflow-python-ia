@@ -1,77 +1,117 @@
-# Chatbot de Apoio à Saúde Mental (MVP)
+# 🧠 Chatbot de Apoio à Saúde Mental (MVP)
 
-Este projeto implementa um MVP de um chatbot inteligente e acolhedor para auxiliar pessoas com TDAH, ansiedade e depressão. O sistema utiliza Inteligência Artificial Generativa (Llama 3 via Amazon Bedrock) com técnica RAG (Retrieval-Augmented Generation) para fornecer informações baseadas em fontes clínicas confiáveis.
+Este projeto implementa um MVP de um assistente virtual inteligente e acolhedor, projetado para auxiliar pessoas com TDAH, ansiedade e depressão. O sistema combina o poder da **Inteligência Artificial Generativa (Llama 3 via Amazon Bedrock)** com **NLP estruturado (Dialogflow ES)** e técnica **RAG (Retrieval-Augmented Generation)** para fornecer suporte psicoeducativo, triagem de crises e estratégias de manejo baseadas em fontes clínicas confiáveis.
 
-## 📋 Visão Geral
+## 📋 Funcionalidades Principais
 
-O objetivo é oferecer apoio psicoeducativo, triagem inteligente e uma interface adaptada para neurodivergentes.
+### 1. 💬 Interface & NLP (Dialogflow ES)
 
-### Funcionalidades Principais
-- **Apoio Psicoeducativo**: Estratégias de manejo de sintomas.
-- **Triagem de Crise**: Identificação de riscos e direcionamento para ajuda (CVV).
-- **RAG**: Respostas fundamentadas em base de conhecimento clínica.
-- **Segurança**: Filtros para prevenção de conteúdo nocivo.
-- **Integração Dialogflow**: Automação completa de Intents, Entidades e Contextos.
+- **Conversação Natural**: Identificação precisa de intenções (Intents) e extração de entidades.
+- **Automação Completa**: Criação e gerenciamento programático de Intents, Entities e Contextos via script Python.
+- **Entidades Customizadas**: Reconhecimento de emoções e termos clínicos.
+- **Gestão de Contexto**: Fluxos de conversa contínuos e coerentes.
 
-## 🚀 Tecnologias
+### 2. 🧠 Inteligência Artificial (AWS Bedrock + Llama 3)
 
-- **Linguagem**: Python 3.9+
-- **Cloud**: AWS (Lambda, Bedrock, OpenSearch, S3), GCP (Dialogflow ES)
-- **IA/LLM**: Meta Llama 3 (via Bedrock)
-- **Frameworks**: Boto3, LangChain, google-cloud-dialogflow
+- **Respostas Generativas**: Geração de conteúdo empático e personalizado.
+- **RAG (Retrieval-Augmented Generation)**: Enriquecimento das respostas com dados clínicos indexados no OpenSearch.
+- **Filtros de Segurança**: Camada de proteção contra conteúdo nocivo ou inadequado.
+
+### 3. 🛡️ Segurança & Infraestrutura
+
+- **Segurança de Dados**: Credenciais gerenciadas via variáveis de ambiente e IAM Roles.
+- **Infraestrutura como Código (IaC)**: Provisionamento automatizado via Terraform (EC2, S3, OpenSearch).
+- **CI/CD**: Pipeline automatizado com GitHub Actions para testes e deploy.
+
+## 🚀 Tecnologias Utilizadas
+
+- **Linguagem Principal**: Python 3.9+
+- **NLP/Chatbot**: Google Dialogflow ES v2
+- **IA Generativa**: Meta Llama 3 (via Amazon Bedrock)
+- **Busca Vetorial**: AWS OpenSearch Service
+- **Computação Serverless**: AWS Lambda
+- **Infraestrutura**: Terraform
+- **Testes**: Pytest, Unittest.mock
+- **Automação**: GitHub Actions
 
 ## 📂 Estrutura do Projeto
 
 ```text
 chatbot-saude-mental/
-├── infra/            # Scripts de Infraestrutura (Terraform/CDK)
-├── src/              # Código Fonte
-│   ├── core/         # Lógica de Integração com Bedrock e RAG
-│   ├── dialogflow/   # Automação e Gerenciamento do Dialogflow
-│   │   ├── data/     # Definições JSON de Intents/Entidades
-│   │   └── manager.py # Script de Automação
-│   ├── utils/        # Utilitários e Filtros de Segurança
-│   └── lambda_function.py # Entrypoint da AWS Lambda
-├── data/             # Base de Conhecimento (Docs)
-├── tests/            # Testes Unitários
-└── requirements.txt  # Dependências
+├── .github/workflows/    # Pipelines de CI/CD
+├── docs/                 # Documentação do projeto
+├── infra/                # Módulos Terraform (Compute, Storage, Search)
+├── ops/                  # Scripts de Operações e Deploy
+├── src/                  # Código Fonte da Aplicação
+│   ├── core/             # Integração com Bedrock e OpenSearch
+│   ├── dialogflow/       # Automação e Gerenciamento do Dialogflow
+│   │   ├── data/         # Configurações JSON (Intents/Entities)
+│   │   └── manager.py    # Script de automação
+│   ├── utils/            # Filtros de Segurança e Helpers
+│   └── lambda_function.py # Entrypoint AWS Lambda
+├── tests/                # Testes Unitários e de Integração
+├── requirements.txt      # Dependências Python
+└── README.md             # Documentação Principal
 ```
 
-## 🛠️ Configuração do Ambiente
+## 🛠️ Instalação e Configuração
 
 ### Pré-requisitos
-- Python 3.9 ou superior
-- Conta AWS com permissões para Bedrock e Lambda
-- Conta Google Cloud com Dialogflow API ativada
-- Git
 
-### Instalação
+- Python 3.9+
+- Conta Google Cloud (para Dialogflow)
+- Conta AWS (para Bedrock/Lambda)
+- Terraform (opcional, para infra)
 
-1. Clone o repositório:
+### Passo a Passo
+
+1. **Clone o repositório**
+
    ```bash
    git clone https://github.com/devjogerio/mvp-tdah-dialogflow-python-ia.git
    cd mvp-tdah-dialogflow-python-ia
    ```
 
-2. Crie um ambiente virtual:
+2. **Crie e ative o ambiente virtual**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/Mac
    # ou
-   venv\Scripts\activate  # Windows
+   venv\Scripts\activate     # Windows
    ```
 
-3. Instale as dependências:
+3. **Instale as dependências**
+
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Configure as variáveis de ambiente:
-   - Copie o arquivo de exemplo:
-     ```bash
-     cp .env.example .env
-     ```
-   - Preencha o `.env` com suas credenciais AWS e GCP (`GOOGLE_APPLICATION_CREDENTIALS`).
+4. **Configuração de Variáveis de Ambiente**
+   Copie o arquivo de exemplo e preencha com suas credenciais:
+   ```bash
+   cp .env.example .env
+   ```
+   _Certifique-se de configurar `GOOGLE_APPLICATION_CREDENTIALS` e credenciais AWS._
+
+## 🤖 Automação do Dialogflow
+
+O projeto inclui um gerenciador automatizado para configurar seu agente Dialogflow.
+
+### Executando a Automação
+
+Para criar/atualizar Intents e Entities no Dialogflow baseando-se nos arquivos JSON em `src/dialogflow/data/`:
+
+```bash
+python src/dialogflow/manager.py
+```
+
+Isso irá:
+
+1. Conectar ao projeto GCP configurado.
+2. Criar entidades (ex: `Emotion`).
+3. Criar intents (ex: `Welcome`, `Crisis Support`).
+4. Configurar frases de treinamento e respostas.
 
 ## 🐳 Execução via Docker (Desenvolvimento Local)
 
@@ -113,46 +153,34 @@ Envie uma requisição POST para `http://localhost:8000/chat` ou use o Swagger U
 
 ## 🧪 Testes
 
-Execute os testes unitários para validar a instalação:
+O projeto utiliza `pytest` para garantir a qualidade do código.
 
 ```bash
-pytest tests/
+# Executar todos os testes
+pytest
+
+# Executar apenas testes do Dialogflow
+pytest tests/test_dialogflow.py
 ```
 
-## 🤖 Automação Dialogflow
+## 📦 Deploy da Infraestrutura
 
-O projeto inclui um gerenciador automatizado para sincronizar Intents e Entidades com o Dialogflow ES.
-
-### Configuração
-1. Baixe a chave de serviço (JSON) do GCP.
-2. Configure `GOOGLE_APPLICATION_CREDENTIALS` no `.env`.
-3. Defina as intents em `src/dialogflow/data/initial_config.json`.
-
-### Execução
-```bash
-# Sincronizar configuração local com a nuvem
-python3 src/dialogflow/manager.py
-```
-
-## ⚙️ Automação e Deploy (Ops)
-
-O projeto conta com uma ferramenta CLI para gerenciar testes, validação de infraestrutura e deploy.
-
-### Uso do `deploy_manager.py`
-
-O script `ops/deploy_manager.py` orquestra o pipeline de desenvolvimento.
+Para provisionar a infraestrutura na AWS:
 
 ```bash
-# Executar validação completa e simular deploy em ambiente de desenvolvimento
-python3 ops/deploy_manager.py --env dev
-
-# Pular testes unitários
-python3 ops/deploy_manager.py --env dev --skip-tests
-
-# Simular deploy em produção
-python3 ops/deploy_manager.py --env prod
+cd infra
+terraform init
+terraform apply
 ```
 
-O script gera logs detalhados em `deploy.log` e um relatório JSON ao final de cada execução.
+## 🤝 Como Contribuir
 
-## 🏗️ Infraestrutura como Código (IaC)
+1. Faça um Fork do projeto.
+2. Crie uma Branch para sua Feature (`git checkout -b feature/MinhaFeature`).
+3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`).
+4. Push para a Branch (`git push origin feature/MinhaFeature`).
+5. Abra um Pull Request.
+
+## 📄 Licença
+
+Este projeto é distribuído sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
