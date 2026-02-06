@@ -6,9 +6,6 @@
 
 Este PR realiza uma revisão completa e atualização do arquivo `README.md` para refletir o estado atual do projeto, incluindo as novas funcionalidades de automação do Dialogflow, arquitetura de IA e instruções detalhadas de configuração.
 
-### 🔗 Issue Relacionada
-Closes # (insira o número da issue se houver)
-
 ## 🛠️ Mudanças Realizadas
 
 - **Visão Geral Expandida**: Detalhamento do propósito do MVP, focando em Saúde Mental, TDAH e suporte psicoeducativo.
