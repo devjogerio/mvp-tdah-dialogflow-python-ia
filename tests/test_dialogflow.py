@@ -56,4 +56,4 @@ def test_create_entity(mock_dialogflow):
                                {"value": "happy", "synonyms": ["joy"]}])
 
     mock_entity_client.create_entity_type.assert_called_once()
-    mock_entity_client.batch_create_entities.assert_called_once()
+    mock_entity_client.batch_update_entities.assert_called_once()

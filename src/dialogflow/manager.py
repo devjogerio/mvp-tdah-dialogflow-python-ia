@@ -60,22 +60,52 @@ class DialogflowManager:
                 parent=parent,
                 entity_type=entity_type
             )
-
-            # Add entries
-            self.entity_types_client.batch_create_entities(
-                parent=response.name,
-                entities=created_entries
-            )
             logger.info(f"Entidade criada: {display_name}")
-            return response
 
         except AlreadyExists:
-            logger.warning(f"Entidade {display_name} já existe.")
+            logger.info(f"Entidade {display_name} já existe. Atualizando...")
+            # Recuperar ID da entidade existente para atualizar
+            # Listar todas para encontrar o ID (não é o mais eficiente, mas funciona para script de sync)
+            all_entities = self.entity_types_client.list_entity_types(
+                parent=parent)
+            target_name = None
+            for ent in all_entities:
+                if ent.display_name == display_name:
+                    target_name = ent.name
+                    break
+
+            if target_name:
+                entity_type.name = target_name
+                response = self.entity_types_client.update_entity_type(
+                    entity_type=entity_type)
+                logger.info(f"Entidade atualizada: {display_name}")
+            else:
+                logger.error(
+                    f"Erro: Entidade {display_name} reportada como existente mas não encontrada na lista.")
+                return
+
         except Exception as e:
-            logger.error(f"Erro ao criar entidade {display_name}: {e}")
+            logger.error(
+                f"Erro ao criar/atualizar entidade {display_name}: {e}")
+            return
+
+        # Add/Update entries (Batch Update)
+        if hasattr(response, 'name'):
+            try:
+                self.entity_types_client.batch_update_entities(
+                    parent=response.name,
+                    entities=created_entries
+                )
+                logger.info(
+                    f"Entradas da entidade {display_name} sincronizadas.")
+            except Exception as e:
+                logger.error(
+                    f"Erro ao atualizar entradas da entidade {display_name}: {e}")
+
+        return response
 
     def create_intent(self, intent_data: Dict[str, Any]):
-        """Cria uma Intent completa."""
+        """Cria ou atualiza uma Intent completa."""
         display_name = intent_data.get("display_name")
         training_phrases_raw = intent_data.get("training_phrases", [])
         messages_raw = intent_data.get("messages", [])
@@ -111,8 +141,32 @@ class DialogflowManager:
             )
             logger.info(f"Intent criada: {display_name}")
             return response
+
+        except AlreadyExists:
+            logger.info(f"Intent {display_name} já existe. Atualizando...")
+            # Buscar intent existente para pegar o ID (name)
+            # Nota: Listar tudo pode ser lento em agentes grandes. O ideal seria cachear ou usar filtro.
+            # Usando list_intents com filtro de view
+            intents = self.intents_client.list_intents(
+                parent=self.parent, intent_view=dialogflow.IntentView.INTENT_VIEW_FULL)
+            target_name = None
+            for i in intents:
+                if i.display_name == display_name:
+                    target_name = i.name
+                    break
+
+            if target_name:
+                intent.name = target_name
+                response = self.intents_client.update_intent(
+                    intent=intent, intent_view=dialogflow.IntentView.INTENT_VIEW_FULL)
+                logger.info(f"Intent atualizada: {display_name}")
+                return response
+            else:
+                logger.error(
+                    f"Intent {display_name} não encontrada para atualização.")
+
         except Exception as e:
-            logger.error(f"Erro ao criar intent {display_name}: {e}")
+            logger.error(f"Erro ao criar/atualizar intent {display_name}: {e}")
 
     def sync_from_json(self, json_path: str):
         """Sincroniza a configuração a partir de um JSON."""
@@ -178,4 +232,13 @@ if __name__ == "__main__":
         project_id = "mvp-tdah-dialogflow-pytho-q9ys"
 
     manager = DialogflowManager(project_id)
-    # manager.sync_from_json("src/dialogflow/data/initial_config.json")
+
+    # Executa sincronização se arquivo de config existir
+    config_path = os.path.join(os.path.dirname(
+        __file__), "data", "initial_config.json")
+    if os.path.exists(config_path):
+        logger.info(f"Iniciando sincronização a partir de {config_path}")
+        manager.sync_from_json(config_path)
+    else:
+        logger.warning(
+            f"Arquivo de configuração não encontrado: {config_path}")
