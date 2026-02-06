@@ -62,6 +62,10 @@ poetry.lock
 *.tfplan
 .terraform.lock.hcl
 
+# --- AWS CDK ---
+cdk.out/
+**/cdk.out/
+
 # --- OS & IDEs ---
 .DS_Store
 .DS_Store?
