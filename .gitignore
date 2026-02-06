@@ -92,10 +92,4 @@ credentials.json
 client_secret.json
 
 # --- Documentation Rules ---
-docs/
-!docs/CHANGELOG.md
-!docs/PULL_REQUEST_DIALOGFLOW.md
-!docs/PULL_REQUEST_DRAFT.md
-!docs/PULL_REQUEST_README.md
-!docs/prd.md
-
+/docs/
