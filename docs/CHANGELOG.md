@@ -8,10 +8,20 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- 
+- Novas Intents segmentadas para melhor fluxo conversacional:
+  - `Sintomas Detalhados` (com contexto de entrada `tdah-info-context`)
+  - `Acolhimento - Visão Geral` e `Acolhimento - Onde Ir` (flow de acolhimento)
+  - `Tratamento - Medicamentos` e `Tratamento - Terapia TCC` (flow de tratamento)
+  - `Dicas de Organização`
+- Suporte a Contextos (Input/Output) e Lifespan no `DialogflowManager` e `initial_config.json`.
+- Mais de 10 frases de treinamento para cada nova intent criada.
 
 ### Changed
-- 
+- Refatoração completa de `initial_config.json`:
+  - Fragmentação de respostas longas em múltiplas mensagens curtas (2-3 frases).
+  - Decomposição de intents complexas (`TDAH Help`, `Acolhimento`, `Tratamento`) em fluxos contextuais.
+  - Atualização de frases de treinamento existentes.
+- Atualização do `DialogflowManager` para processar e sincronizar contextos de entrada e saída definidos no JSON.
 
 ### Deprecated
 - 
