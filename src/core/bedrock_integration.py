@@ -2,7 +2,6 @@ import boto3
 import json
 import os
 import logging
-from typing import Dict, Any
 from src.core.opensearch_service import OpenSearchService
 
 """

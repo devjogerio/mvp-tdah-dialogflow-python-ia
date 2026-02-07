@@ -7,13 +7,29 @@
         "Oi",
         "Bom dia",
         "Boa tarde",
-        "Começar"
+        "Começar",
+        "Iniciar conversa",
+        "Oi, tudo bem?",
+        "Tem alguém aí?",
+        "Oi bot",
+        "Saudações"
       ],
       "messages": [
         {
           "text": [
-            "Olá! Sou seu assistente de saúde mental. Como posso ajudar você hoje?"
+            "Olá! Sou seu assistente de saúde mental. Estou aqui para oferecer apoio e informações sobre TDAH, ansiedade e depressão."
           ]
+        },
+        {
+          "text": [
+            "Como posso ajudar você hoje? Podemos conversar sobre sintomas, diagnóstico ou tratamentos."
+          ]
+        }
+      ],
+      "output_contexts": [
+        {
+          "name": "welcome-context",
+          "lifespan_count": 5
         }
       ],
       "priority": 500000
@@ -23,13 +39,31 @@
       "training_phrases": [
         "O que é TDAH?",
         "Tenho sintomas de TDAH",
-        "Ajuda com foco"
+        "Ajuda com foco",
+        "Me explica sobre TDAH",
+        "O que significa TDAH?",
+        "Quais os sinais de TDAH?",
+        "Acho que sou hiperativo",
+        "Problemas de atenção",
+        "Não consigo me concentrar",
+        "O que é déficit de atenção?"
       ],
       "messages": [
         {
           "text": [
-            "O TDAH é um transtorno neurobiológico. Posso explicar os sintomas ou sugerir estratégias de foco. O que prefere?"
+            "O TDAH (Transtorno do Déficit de Atenção com Hiperatividade) é um transtorno neurobiológico de causas genéticas."
           ]
+        },
+        {
+          "text": [
+            "Ele se caracteriza por sintomas de desatenção, inquietude e impulsividade. Posso explicar os sintomas detalhados ou sugerir estratégias. O que prefere?"
+          ]
+        }
+      ],
+      "output_contexts": [
+        {
+          "name": "tdah-info-context",
+          "lifespan_count": 5
         }
       ],
       "parameters": [
@@ -43,21 +77,369 @@
       "priority": 500000
     },
     {
+      "display_name": "Sintomas Detalhados",
+      "training_phrases": [
+        "Quais são os sintomas detalhados?",
+        "Me fale mais sobre os sintomas",
+        "Lista de sintomas",
+        "Como saber se tenho TDAH pelos sintomas?",
+        "Sintomas de desatenção",
+        "Sintomas de hiperatividade",
+        "Sinais de impulsividade",
+        "Quero saber os detalhes dos sintomas",
+        "Exemplos de sintomas",
+        "Características do TDAH"
+      ],
+      "input_context_names": ["tdah-info-context"],
+      "messages": [
+        {
+          "text": [
+            "Os sintomas variam, mas incluem desatenção (erros por descuido, dificuldade em manter foco) e hiperatividade/impulsividade (agitação, falar excessivamente)."
+          ]
+        },
+        {
+          "text": [
+            "Muitos adultos relatam também desorganização, esquecimentos frequentes e dificuldade em gerenciar o tempo."
+          ]
+        }
+      ],
+      "output_contexts": [
+        {
+          "name": "sintomas-context",
+          "lifespan_count": 5
+        }
+      ],
+      "priority": 500000
+    },
+    {
       "display_name": "Crisis Support",
       "training_phrases": [
         "Quero morrer",
         "Não aguento mais",
-        "Socorro"
+        "Socorro",
+        "Estou pensando em suicídio",
+        "A vida não vale a pena",
+        "Vou acabar com tudo",
+        "Preciso de ajuda urgente",
+        "Estou desesperado",
+        "Ninguém se importa comigo",
+        "Quero sumir"
       ],
       "messages": [
         {
           "text": [
-            "Se você está em perigo imediato, ligue para o CVV 188. Sua vida importa."
+            "Se você está em perigo imediato ou sentindo muita dor emocional, por favor, não passe por isso sozinho."
+          ]
+        },
+        {
+          "text": [
+            "Ligue para o CVV no número 188. Eles oferecem apoio emocional gratuito e sigiloso 24 horas por dia. Sua vida importa muito."
           ]
         }
       ],
       "priority": 1000000,
       "webhook_state": "WEBHOOK_STATE_ENABLED"
+    },
+    {
+      "display_name": "Acolhimento - Visão Geral",
+      "training_phrases": [
+        "Como funciona o acolhimento?",
+        "Tenho suspeita de TDAH",
+        "Estou desanimado e sem foco",
+        "Acho que preciso de ajuda",
+        "Não sei por onde começar",
+        "Me sinto perdido com meus sintomas",
+        "Quem pode me acolher?",
+        "Primeiros passos para tratamento",
+        "Estou confuso sobre o que tenho",
+        "Preciso de orientação inicial"
+      ],
+      "messages": [
+        {
+          "text": [
+            "Entendo como você se sente. O primeiro passo é reconhecer que buscar ajuda é um ato de coragem."
+          ]
+        },
+        {
+          "text": [
+            "Geralmente, o acolhimento começa identificando o que mais te incomoda: desânimo, falta de foco ou ansiedade. Quer saber onde buscar ajuda profissional?"
+          ]
+        }
+      ],
+      "output_contexts": [
+        {
+          "name": "acolhimento-context",
+          "lifespan_count": 5
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Acolhimento - Onde Ir",
+      "training_phrases": [
+        "Onde devo ir primeiro?",
+        "Qual médico procurar?",
+        "Vou no postinho ou no especialista?",
+        "Onde buscar ajuda?",
+        "Quem procuro primeiro?",
+        "Devo ir num psicólogo ou psiquiatra?",
+        "Como marcar consulta no SUS?",
+        "Clínico geral atende isso?",
+        "Onde conseguir encaminhamento?",
+        "Local de atendimento inicial"
+      ],
+      "input_context_names": ["acolhimento-context"],
+      "messages": [
+        {
+          "text": [
+            "Você pode procurar uma Unidade Básica de Saúde (UBS) e falar com um Clínico Geral. Ele fará a triagem inicial."
+          ]
+        },
+        {
+          "text": [
+            "Se necessário, ele te encaminhará para especialistas como Psiquiatra ou Neurologista, ou para o CAPS da sua região."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Avaliação Diagnóstica",
+      "training_phrases": [
+        "Como é feito o diagnóstico?",
+        "Preciso de um psiquiatra ou neurologista?",
+        "O que acontece na avaliação?",
+        "Diferença entre TDAH e depressão",
+        "Quais exames preciso fazer?",
+        "O diagnóstico demora?",
+        "Tem exame de sangue para TDAH?",
+        "Como o médico sabe que tenho TDAH?",
+        "Avaliação neuropsicológica é necessária?",
+        "Diagnóstico diferencial"
+      ],
+      "messages": [
+        {
+          "text": [
+            "O diagnóstico é clínico, feito por Psiquiatra ou Neurologista através de entrevistas detalhadas e análise do histórico de vida."
+          ]
+        },
+        {
+          "text": [
+            "Às vezes, testes neuropsicológicos ajudam a diferenciar sintomas de TDAH de episódios depressivos ou ansiosos."
+          ]
+        }
+      ],
+      "output_contexts": [
+        {
+          "name": "diagnostico-context",
+          "lifespan_count": 5
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Planejamento do Tratamento",
+      "training_phrases": [
+        "Qual o tratamento para TDAH?",
+        "Como tratar TDAH e depressão juntos?",
+        "O que é abordagem multimodal?",
+        "Existe cura?",
+        "Quais as opções de tratamento?",
+        "Como melhorar sem remédio?",
+        "O tratamento é pra sempre?",
+        "Melhor forma de tratar",
+        "Plano de tratamento",
+        "Estratégias de tratamento"
+      ],
+      "messages": [
+        {
+          "text": [
+            "O tratamento ideal é multimodal: combina medicação, psicoterapia e mudanças no estilo de vida."
+          ]
+        },
+        {
+          "text": [
+            "Geralmente, se houver depressão associada, prioriza-se estabilizar o humor antes de tratar o foco. Quer saber mais sobre remédios ou terapia?"
+          ]
+        }
+      ],
+      "output_contexts": [
+        {
+          "name": "tratamento-context",
+          "lifespan_count": 5
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Tratamento - Medicamentos",
+      "training_phrases": [
+        "Preciso tomar remédio?",
+        "Quais os remédios para TDAH?",
+        "Ritalina vicia?",
+        "Venvanse ou Ritalina?",
+        "Tratamento medicamentoso",
+        "Remédios para depressão",
+        "Efeitos colaterais dos remédios",
+        "Medicação é obrigatória?",
+        "Tipos de estimulantes",
+        "Antidepressivos ajudam no TDAH?"
+      ],
+      "input_context_names": ["tratamento-context"],
+      "messages": [
+        {
+          "text": [
+            "Existem estimulantes (como metilfenidato e lisdexanfetamina) e não estimulantes. Para depressão, usam-se antidepressivos."
+          ]
+        },
+        {
+          "text": [
+            "A medicação ajuda a equilibrar a química cerebral, mas deve ser sempre prescrita e acompanhada por um médico."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Tratamento - Terapia TCC",
+      "training_phrases": [
+        "O que é TCC?",
+        "Terapia ajuda?",
+        "Qual a melhor terapia para TDAH?",
+        "Como funciona a Terapia Cognitivo-Comportamental?",
+        "Psicoterapia para TDAH",
+        "TCC ou psicanálise?",
+        "Preciso de psicólogo?",
+        "Benefícios da terapia",
+        "Terapia para organização",
+        "Tratamento psicológico"
+      ],
+      "input_context_names": ["tratamento-context"],
+      "messages": [
+        {
+          "text": [
+            "A Terapia Cognitivo-Comportamental (TCC) é padrão-ouro para TDAH. Ela foca em reestruturar pensamentos e criar estratégias práticas."
+          ]
+        },
+        {
+          "text": [
+            "Ela ajuda a desenvolver habilidades de organização, gestão de tempo e regulação emocional."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Dicas de Organização",
+      "training_phrases": [
+        "Dicas de organização",
+        "Como me organizar melhor?",
+        "Não consigo cumprir prazos",
+        "Minha vida é uma bagunça",
+        "Estratégias para não esquecer as coisas",
+        "Uso de agenda funciona?",
+        "Como parar de procrastinar?",
+        "Técnicas de produtividade para TDAH",
+        "Organizar rotina",
+        "Métodos de foco"
+      ],
+      "messages": [
+        {
+          "text": [
+            "A organização externa ajuda a mente interna. Tente usar planners, agendas digitais com alarmes e listas de tarefas."
+          ]
+        },
+        {
+          "text": [
+            "Quebre tarefas grandes em passos menores e use a técnica Pomodoro (foco por tempos curtos com pausas)."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Intervenções Terapêuticas e Hábitos",
+      "training_phrases": [
+        "Tratamento sem remédio",
+        "Mudanças no estilo de vida",
+        "Psicoeducação para TDAH",
+        "O que posso fazer além de remédio?",
+        "Hábitos saudáveis para TDAH",
+        "Exercício ajuda no TDAH?",
+        "Alimentação influencia?",
+        "Sono e TDAH",
+        "Mindfulness ajuda?",
+        "Rotina saudável"
+      ],
+      "messages": [
+        {
+          "text": [
+            "Mudanças no estilo de vida são fundamentais. Atividades físicas aeróbicas ajudam muito na regulação da dopamina."
+          ]
+        },
+        {
+          "text": [
+            "Higiene do sono e uma alimentação equilibrada também impactam diretamente na capacidade de concentração."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Acompanhamento Contínuo",
+      "training_phrases": [
+        "Preciso voltar no médico?",
+        "Como saber se o tratamento está funcionando?",
+        "Acompanhamento a longo prazo",
+        "Ajuste de medicação",
+        "Quando recebo alta?",
+        "Tenho que tomar remédio pra sempre?",
+        "Monitoramento do tratamento",
+        "Frequência das consultas",
+        "Melhora dos sintomas",
+        "Recaídas são normais?"
+      ],
+      "messages": [
+        {
+          "text": [
+            "O acompanhamento deve ser constante. Consultas periódicas servem para ajustar doses e avaliar o progresso."
+          ]
+        },
+        {
+          "text": [
+            "Lembre-se: a ação gera motivação. Pequenos progressos diários são mais importantes que grandes saltos esporádicos."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "Onde obter atendimento",
+      "training_phrases": [
+        "O SUS trata TDAH?",
+        "Como conseguir remédio no SUS?",
+        "Psicólogo pelo SUS",
+        "Atendimento gratuito para TDAH",
+        "Remédio de graça",
+        "Tem psiquiatra no posto?",
+        "CAPS atende TDAH?",
+        "Farmácia popular tem ritalina?",
+        "Atendimento público",
+        "Direitos do paciente TDAH"
+      ],
+      "messages": [
+        {
+          "text": [
+            "Sim, o SUS oferece tratamento. Você deve iniciar pela UBS mais próxima de sua casa."
+          ]
+        },
+        {
+          "text": [
+            "---\n**Aviso Legal**: Este conteúdo é informativo e não substitui a consulta com um profissional de saúde."
+          ]
+        }
+      ],
+      "priority": 500000
     }
   ],
   "entities": [
@@ -72,6 +454,76 @@
         {
           "value": "tristeza",
           "synonyms": ["triste", "deprimido", "baixo astral"]
+        }
+      ]
+    },
+    {
+      "display_name": "Especialista",
+      "kind": "KIND_MAP",
+      "entries": [
+        {
+          "value": "psiquiatra",
+          "synonyms": ["Psiquiatra"]
+        },
+        {
+          "value": "neurologista",
+          "synonyms": ["Neurologista"]
+        },
+        {
+          "value": "clínico geral",
+          "synonyms": ["Clínico Geral"]
+        }
+      ]
+    },
+    {
+      "display_name": "Sintoma",
+      "kind": "KIND_MAP",
+      "entries": [
+        {
+          "value": "desânimo",
+          "synonyms": ["desânimo"]
+        },
+        {
+          "value": "falta de motivação",
+          "synonyms": ["falta de motivação"]
+        },
+        {
+          "value": "baixa autoestima",
+          "synonyms": ["baixa autoestima"]
+        },
+        {
+          "value": "esquecimentos",
+          "synonyms": ["esquecimentos"]
+        },
+        {
+          "value": "desorganização",
+          "synonyms": ["desorganização"]
+        }
+      ]
+    },
+    {
+      "display_name": "Tratamento",
+      "kind": "KIND_MAP",
+      "entries": [
+        {
+          "value": "antidepressivos",
+          "synonyms": ["Antidepressivos"]
+        },
+        {
+          "value": "estimulantes",
+          "synonyms": ["Estimulantes"]
+        },
+        {
+          "value": "tcc",
+          "synonyms": ["TCC"]
+        },
+        {
+          "value": "terapia cognitivo-comportamental",
+          "synonyms": ["Terapia Cognitivo-Comportamental"]
+        },
+        {
+          "value": "psicoeducação",
+          "synonyms": ["Psicoeducação"]
         }
       ]
     }
