@@ -58,6 +58,112 @@
       ],
       "priority": 1000000,
       "webhook_state": "WEBHOOK_STATE_ENABLED"
+    },
+    {
+      "display_name": "CaseStudy - Acolhimento e Suspeita",
+      "training_phrases": [
+        "Como funciona o acolhimento?",
+        "Tenho suspeita de TDAH",
+        "Estou desanimado e sem foco",
+        "Onde devo ir primeiro?",
+        "Sintomas iniciais de TDAH"
+      ],
+      "messages": [
+        {
+          "text": [
+            "- **Onde**: Unidade Básica de Saúde (UBS) ou Clínico Geral.\n- **O que acontece**: O paciente busca ajuda por desânimo, falta de motivação, baixa autoestima, esquecimentos ou desorganização extrema.\n- **Ação**: O médico clínico realiza a triagem inicial e encaminha para especialistas (Psiquiatra/Neurologista)."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "CaseStudy - Avaliação Diagnóstica",
+      "training_phrases": [
+        "Como é feito o diagnóstico?",
+        "Preciso de um psiquiatra ou neurologista?",
+        "O que acontece na avaliação?",
+        "Diferença entre TDAH e depressão",
+        "Quais exames preciso fazer?"
+      ],
+      "messages": [
+        {
+          "text": [
+            "- **Onde**: Psiquiatra, Neurologista ou CAPS (Centro de Atenção Psicossocial).\n- **O que acontece**: Avaliação clínica detalhada, entrevistas, histórico de vida (infância) e, se necessário, testes neuropsicológicos para diferenciar o que é sintoma de TDAH e o que é episódio depressivo.\n- **Comorbidade**: É crucial identificar que o TDAH é um fator de risco significativo para a depressão."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "CaseStudy - Planejamento do Tratamento",
+      "training_phrases": [
+        "Qual o tratamento para TDAH?",
+        "Preciso tomar remédio?",
+        "Como tratar TDAH e depressão juntos?",
+        "O que é abordagem multimodal?",
+        "Tratamento medicamentoso"
+      ],
+      "messages": [
+        {
+          "text": [
+            "- **Foco Inicial**: Geralmente, prioriza-se a estabilização da depressão (humor) para depois otimizar o tratamento do TDAH.\n- **Antidepressivos**: Para controlar os sintomas da depressão (ex: inibidores seletivos de recaptação de serotonina).\n- **Estimulantes/Não Estimulantes**: Para o TDAH (metilfenidato, lisdexanfetamina, etc.).\n- **Terapia Cognitivo-Comportamental (TCC)**: É o padrão-ouro para reestruturar crenças negativas e desenvolver habilidades organizacionais."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "CaseStudy - Intervenções Terapêuticas e Hábitos",
+      "training_phrases": [
+        "Tratamento sem remédio",
+        "O que é TCC?",
+        "Dicas de organização",
+        "Mudanças no estilo de vida",
+        "Psicoeducação para TDAH"
+      ],
+      "messages": [
+        {
+          "text": [
+            "- **Terapia (TCC/DBT)**: Foco em regulação emocional, tolerância ao estresse e gestão da rotina.\n- **Psicoeducação**: Entender como o cérebro com TDAH funciona para reduzir a culpa.\n- **Estilo de Vida**: Atividades físicas (aeróbicas são muito eficazes), higiene do sono e alimentação.\n- **Organização**: Uso de planners, agendamento de alarmes e quebra de tarefas grandes em pequenas etapas."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "CaseStudy - Acompanhamento Contínuo",
+      "training_phrases": [
+        "Preciso voltar no médico?",
+        "Como saber se o tratamento está funcionando?",
+        "Acompanhamento a longo prazo",
+        "Ajuste de medicação"
+      ],
+      "messages": [
+        {
+          "text": [
+            "- **Retornos**: Consultas periódicas para ajustar medicações (o tratamento do TDAH pode mudar após a depressão melhorar).\n- **Ajustes**: A \"ação gera motivação\" é o lema; pequenos passos diários são essenciais para quebrar o ciclo de desmotivação."
+          ]
+        }
+      ],
+      "priority": 500000
+    },
+    {
+      "display_name": "CaseStudy - Onde obter atendimento",
+      "training_phrases": [
+        "O SUS trata TDAH?",
+        "Como conseguir remédio no SUS?",
+        "Psicólogo pelo SUS",
+        "Atendimento gratuito para TDAH"
+      ],
+      "messages": [
+        {
+          "text": [
+            "---\n**Aviso Legal**: Este conteúdo é informativo e não substitui a consulta com um profissional de saúde."
+          ]
+        }
+      ],
+      "priority": 500000
     }
   ],
   "entities": [
@@ -67,11 +173,115 @@
       "entries": [
         {
           "value": "ansiedade",
-          "synonyms": ["ansioso", "nervoso", "pânico"]
+          "synonyms": [
+            "ansioso",
+            "nervoso",
+            "pânico"
+          ]
         },
         {
           "value": "tristeza",
-          "synonyms": ["triste", "deprimido", "baixo astral"]
+          "synonyms": [
+            "triste",
+            "deprimido",
+            "baixo astral"
+          ]
+        }
+      ]
+    },
+    {
+      "display_name": "Especialista",
+      "kind": "KIND_MAP",
+      "entries": [
+        {
+          "value": "psiquiatra",
+          "synonyms": [
+            "Psiquiatra"
+          ]
+        },
+        {
+          "value": "neurologista",
+          "synonyms": [
+            "Neurologista"
+          ]
+        },
+        {
+          "value": "clínico geral",
+          "synonyms": [
+            "Clínico Geral"
+          ]
+        }
+      ]
+    },
+    {
+      "display_name": "Sintoma",
+      "kind": "KIND_MAP",
+      "entries": [
+        {
+          "value": "desânimo",
+          "synonyms": [
+            "desânimo"
+          ]
+        },
+        {
+          "value": "falta de motivação",
+          "synonyms": [
+            "falta de motivação"
+          ]
+        },
+        {
+          "value": "baixa autoestima",
+          "synonyms": [
+            "baixa autoestima"
+          ]
+        },
+        {
+          "value": "esquecimentos",
+          "synonyms": [
+            "esquecimentos"
+          ]
+        },
+        {
+          "value": "desorganização",
+          "synonyms": [
+            "desorganização"
+          ]
+        }
+      ]
+    },
+    {
+      "display_name": "Tratamento",
+      "kind": "KIND_MAP",
+      "entries": [
+        {
+          "value": "antidepressivos",
+          "synonyms": [
+            "Antidepressivos"
+          ]
+        },
+        {
+          "value": "estimulantes",
+          "synonyms": [
+            "Estimulantes"
+          ]
+        },
+        {
+          "value": "tcc",
+          "synonyms": [
+            "TCC"
+          ]
+        },
+        {
+          "value": "terapia cognitivo-comportamental",
+          "synonyms": [
+            "Terapia Cognitivo-Comportamental"
+          ]
+        },
+        {
+          "value": "psicoeducação",
+          "synonyms": [
+            "Psicoeducação"
+          ]
         }
       ]
     }

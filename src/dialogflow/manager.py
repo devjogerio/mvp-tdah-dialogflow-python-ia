@@ -1,7 +1,6 @@
 from google.cloud import dialogflow_v2 as dialogflow
-from google.api_core.exceptions import GoogleAPICallError, AlreadyExists
+from google.api_core.exceptions import AlreadyExists
 import os
-import sys
 import json
 import logging
 from typing import List, Dict, Any
