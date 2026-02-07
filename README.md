@@ -1,6 +1,6 @@
 # 🧠 Chatbot de Apoio à Saúde Mental (MVP)
 
-Este projeto implementa um MVP de um assistente virtual inteligente e acolhedor, projetado para auxiliar pessoas com TDAH, ansiedade e depressão. O sistema combina o poder da **Inteligência Artificial Generativa (Llama 3 via Amazon Bedrock)** com **NLP estruturado (Dialogflow ES)** e técnica **RAG (Retrieval-Augmented Generation)** para fornecer suporte psicoeducativo, triagem de crises e estratégias de manejo baseadas em fontes clínicas confiáveis.
+Este projeto implementa um MVP de um assistente virtual inteligente e acolhedor, projetado para auxiliar pessoas com TDAH, ansiedade e depressão. O sistema combina o poder da **Inteligência Artificial Generativa (Multi-LLM: Bedrock, Gemini, OpenAI)** com **NLP estruturado (Dialogflow ES)** e técnica **RAG (Retrieval-Augmented Generation)** para fornecer suporte psicoeducativo, triagem de crises e estratégias de manejo baseadas em fontes clínicas confiáveis.
 
 ## 📋 Funcionalidades Principais
 
@@ -11,9 +11,13 @@ Este projeto implementa um MVP de um assistente virtual inteligente e acolhedor,
 - **Entidades Customizadas**: Reconhecimento de emoções e termos clínicos.
 - **Gestão de Contexto**: Fluxos de conversa contínuos e coerentes.
 
-### 2. 🧠 Inteligência Artificial (AWS Bedrock + Llama 3)
+### 2. 🧠 Inteligência Artificial (Multi-LLM)
 
-- **Respostas Generativas**: Geração de conteúdo empático e personalizado.
+- **Arquitetura Modular**: Suporte plugável para múltiplos provedores de LLM.
+- **Provedores Suportados**:
+  - **AWS Bedrock**: Llama 3 (padrão)
+  - **Google Gemini**: Gemini Pro
+  - **OpenAI**: GPT-3.5 / GPT-4
 - **RAG (Retrieval-Augmented Generation)**: Enriquecimento das respostas com dados clínicos indexados no OpenSearch.
 - **Filtros de Segurança**: Camada de proteção contra conteúdo nocivo ou inadequado.
 
@@ -27,7 +31,7 @@ Este projeto implementa um MVP de um assistente virtual inteligente e acolhedor,
 
 - **Linguagem Principal**: Python 3.9+
 - **NLP/Chatbot**: Google Dialogflow ES v2
-- **IA Generativa**: Meta Llama 3 (via Amazon Bedrock)
+- **IA Generativa**: AWS Bedrock, Google Gemini, OpenAI
 - **Busca Vetorial**: AWS OpenSearch Service
 - **Computação Serverless**: AWS Lambda
 - **Infraestrutura**: Terraform
@@ -118,17 +122,20 @@ Isso irá:
 O projeto conta com um ambiente Docker completo para facilitar o desenvolvimento local, simulando a infraestrutura AWS (OpenSearch) e encapsulando a Lambda em uma API REST local.
 
 ### Pré-requisitos
+
 - Docker e Docker Compose instalados.
 
 ### Como Executar
 
 1. **Configurar Variáveis**:
    Certifique-se de que o arquivo `.env` existe e contém suas credenciais AWS (necessárias para acessar o Bedrock na nuvem, já que ele não é mockado localmente):
+
    ```bash
    cp .env.example .env
    ```
 
 2. **Iniciar o Ambiente**:
+
    ```bash
    docker-compose up --build
    ```
@@ -139,12 +146,15 @@ O projeto conta com um ambiente Docker completo para facilitar o desenvolvimento
    - **OpenSearch API**: https://localhost:9200 (User: `admin`, Pass: `AdminStrongPass123!`)
 
 ### Detalhes da Estrutura Docker
+
 - **app**: Container Python rodando a lógica da Lambda via FastAPI (hot-reload ativado).
 - **opensearch**: Nó único do OpenSearch para RAG local.
 - **opensearch-dashboards**: Interface visual para inspecionar índices e vetores.
 
 ### Testando o Chatbot Localmente
+
 Envie uma requisição POST para `http://localhost:8000/chat` ou use o Swagger UI:
+
 ```json
 {
   "message": "Como lidar com a ansiedade?"
