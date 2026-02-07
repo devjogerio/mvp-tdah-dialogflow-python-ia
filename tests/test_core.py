@@ -1,42 +1,37 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from src.core.bedrock_integration import BedrockService
-
+from src.core.assistant_service import AssistantService
+from src.core.llm.bedrock import BedrockLLM
 
 @pytest.fixture
-def mock_boto3():
-    with patch("boto3.client") as mock:
+def mock_llm_factory():
+    with patch("src.core.assistant_service.LLMFactory") as mock:
+        # Configura o factory para retornar um mock de BedrockLLM por padrão
+        mock_provider = MagicMock(spec=BedrockLLM)
+        mock_provider.invoke.return_value = "Resposta gerada"
+        mock.create_provider.return_value = mock_provider
         yield mock
 
+def test_assistant_init(mock_llm_factory):
+    """Testa inicialização do serviço AssistantService."""
+    service = AssistantService()
+    mock_llm_factory.create_provider.assert_called_once()
+    assert service.llm_provider is not None
 
-def test_bedrock_init(mock_boto3):
-    """Testa inicialização do serviço."""
-    service = BedrockService()
-    assert service.model_id == "meta.llama3-8b-instruct-v1:0"
-    mock_boto3.assert_called_once_with(
-        service_name="bedrock-runtime", region_name="us-east-1")
-
-
-def test_retrieve_context():
+def test_retrieve_context(mock_llm_factory):
     """Testa retrieval (mockado por enquanto)."""
-    service = BedrockService()
+    service = AssistantService()
     # Mock do opensearch_service para não precisar de credenciais
     service.opensearch_service = None
 
     context = service.retrieve_context("query")
     assert "TDAH" in context
 
-
-def test_invoke_model_success(mock_boto3):
+def test_invoke_model_success(mock_llm_factory):
     """Testa invocação do modelo com sucesso."""
-    # Setup do mock de resposta do Boto3
-    mock_client = mock_boto3.return_value
-    mock_response_body = MagicMock()
-    mock_response_body.read.return_value = b'{"generation": "Resposta gerada"}'
-    mock_client.invoke_model.return_value = {"body": mock_response_body}
-
-    service = BedrockService()
+    service = AssistantService()
+    
     response = service.invoke_model("prompt", "context")
 
     assert response == "Resposta gerada"
-    mock_client.invoke_model.assert_called_once()
+    service.llm_provider.invoke.assert_called_once_with("prompt", "context")

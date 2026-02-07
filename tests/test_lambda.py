@@ -3,12 +3,12 @@ import json
 from unittest.mock import patch, MagicMock
 from src.lambda_function import lambda_handler
 
-@patch("src.lambda_function.bedrock_service")
-def test_lambda_handler_success(mock_bedrock):
+@patch("src.lambda_function.assistant_service")
+def test_lambda_handler_success(mock_assistant):
     """Testa fluxo normal do Lambda."""
-    # Mock do comportamento do BedrockService
-    mock_bedrock.retrieve_context.return_value = "Contexto"
-    mock_bedrock.invoke_model.return_value = "Resposta do Modelo"
+    # Mock do comportamento do AssistantService
+    mock_assistant.retrieve_context.return_value = "Contexto"
+    mock_assistant.invoke_model.return_value = "Resposta do Modelo"
 
     event = {"body": json.dumps({"message": "Olá"})}
     response = lambda_handler(event, None)
