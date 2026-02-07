@@ -33,8 +33,8 @@ class DialogflowManager:
 
     def create_entity_type(self, display_name: str, kind: str, entries: List[Dict]):
         """Cria uma entidade customizada."""
+        # Monta o identificador completo do agente no formato exigido pela API
         parent = f"projects/{self.project_id}/agent"
-
         # Check if exists
         # Simplified logic: In prod, list and check names first to avoid errors or duplication
 
