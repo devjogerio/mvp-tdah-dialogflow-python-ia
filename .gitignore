@@ -96,7 +96,13 @@ credentials.json
 client_secret.json
 
 # --- Documentation Rules ---
-# /docs/ (Removido para permitir versionamento da documentação)
+# Ignorar tudo na pasta docs/ por padrão
+docs/*
+
+# Exceções (arquivos que DEVEM ser versionados)
+!docs/CHANGELOG.md
+!docs/MIGRATION.md
+# README.md raiz já é rastreado por padrão
 
 # --- Virtual Envs Custom ---
 .venv_stable/
