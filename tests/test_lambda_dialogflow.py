@@ -41,11 +41,11 @@ def api_gateway_event():
         })
     }
 
-@patch("src.lambda_function.bedrock_service")
-def test_lambda_handler_dialogflow(mock_bedrock, dialogflow_event):
+@patch("src.lambda_function.assistant_service")
+def test_lambda_handler_dialogflow(mock_assistant, dialogflow_event):
     """Testa se a Lambda responde corretamente ao formato Dialogflow"""
-    mock_bedrock.retrieve_context.return_value = "Contexto sobre TDAH"
-    mock_bedrock.invoke_model.return_value = "TDAH é um transtorno..."
+    mock_assistant.retrieve_context.return_value = "Contexto sobre TDAH"
+    mock_assistant.invoke_model.return_value = "TDAH é um transtorno..."
     
     response = lambda_handler(dialogflow_event, {})
     
@@ -57,11 +57,11 @@ def test_lambda_handler_dialogflow(mock_bedrock, dialogflow_event):
     assert body["fulfillmentText"] == "TDAH é um transtorno..."
     assert "fulfillmentMessages" in body
 
-@patch("src.lambda_function.bedrock_service")
-def test_lambda_handler_api_gateway(mock_bedrock, api_gateway_event):
+@patch("src.lambda_function.assistant_service")
+def test_lambda_handler_api_gateway(mock_assistant, api_gateway_event):
     """Testa se a Lambda mantém compatibilidade com API Gateway simples"""
-    mock_bedrock.retrieve_context.return_value = "Contexto sobre TDAH"
-    mock_bedrock.invoke_model.return_value = "TDAH é um transtorno..."
+    mock_assistant.retrieve_context.return_value = "Contexto sobre TDAH"
+    mock_assistant.invoke_model.return_value = "TDAH é um transtorno..."
     
     response = lambda_handler(api_gateway_event, {})
     
