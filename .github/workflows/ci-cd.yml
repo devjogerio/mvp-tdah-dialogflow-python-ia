@@ -33,6 +33,10 @@ jobs:
           export PYTHONPATH=$PYTHONPATH:.
           python src/dialogflow/scripts/validate_config.py
 
+      - name: Validate Documentation Location
+        run: |
+          python ops/validate_docs_location.py
+
       - name: Run Tests
         run: |
           export PYTHONPATH=$PYTHONPATH:.
@@ -78,27 +82,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-      
+
       - name: Install AWS CDK
         run: npm install -g aws-cdk
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
+
       - name: Install Dependencies
         working-directory: ./infra
         run: pip install -r requirements.txt
-        
+
       - name: Deploy to Dev
         working-directory: ./infra
-        run: echo "cdk deploy --require-approval never" 
+        run: echo "cdk deploy --require-approval never"
         # Comando real comentado por segurança em exemplo:
         # run: cdk deploy --require-approval never
         env:
@@ -113,20 +117,20 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-      
+
       - name: Install AWS CDK
         run: npm install -g aws-cdk
-        
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
+
       - name: Install Dependencies
         working-directory: ./infra
         run: pip install -r requirements.txt

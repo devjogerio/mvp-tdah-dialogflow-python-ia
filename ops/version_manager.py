@@ -12,7 +12,7 @@ Responsável por atualizar version.txt, package.json e CHANGELOG.md.
 FILES = {
     "txt": "version.txt",
     "json": "package.json",
-    "changelog": "CHANGELOG.md"
+    "changelog": "docs/CHANGELOG.md"
 }
 
 

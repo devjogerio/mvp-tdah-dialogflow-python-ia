@@ -1,3 +1,8 @@
+import os
+# Fix for Python 3.14 + Protobuf compatibility issues
+# Must be set before importing ANY google library
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
 from typing import List, Dict, Any, Optional
 import time
 import logging
@@ -5,11 +10,7 @@ import json
 from google.api_core import retry
 from google.api_core.exceptions import AlreadyExists, GoogleAPICallError, RetryError
 from google.cloud import dialogflow_v2 as dialogflow
-import os
-# Fix for Python 3.14 + Protobuf compatibility issues
-# Must be set before importing ANY google library
-os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
-
+from google.auth.exceptions import DefaultCredentialsError
 
 # Configuração de Logging detalhado
 logging.basicConfig(
@@ -44,6 +45,16 @@ class DialogflowManager:
             self.parent = f"projects/{project_id}/agent"
             logger.info(
                 f"Cliente Dialogflow inicializado para projeto: {project_id}")
+        except (DefaultCredentialsError, ValueError) as e:
+            logger.critical(f"FALHA DE CREDENCIAIS: {e}")
+            print("\n❌ ERRO CRÍTICO DE AUTENTICAÇÃO")
+            print("O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock.")
+            print("Para executar a automação real, você precisa de um arquivo de chave de conta de serviço VÁLIDO do Google Cloud.")
+            print("1. Acesse o console do GCP > IAM & Admin > Service Accounts")
+            print("2. Crie uma chave JSON para sua conta de serviço")
+            print("3. Salve como 'key-json/credentials.json' (ou atualize seu .env)")
+            print("4. Configure GOOGLE_APPLICATION_CREDENTIALS para o caminho correto.\n")
+            raise e
         except Exception as e:
             logger.critical(
                 f"Falha na autenticação ou inicialização do cliente: {e}")
@@ -116,7 +127,7 @@ class DialogflowManager:
 
         try:
             # Tentativa de Criação
-            self.entity_types_client.create_entity_type(
+            created_entity = self.entity_types_client.create_entity_type(
                 parent=self.parent,
                 entity_type=entity_type,
                 retry=self.retry_policy
@@ -125,7 +136,7 @@ class DialogflowManager:
             self.stats["entities_created"] += 1
 
             # Recuperar ID para batch update
-            name = self._get_entity_type_id(display_name)
+            name = created_entity.name
 
         except AlreadyExists:
             logger.info(
@@ -213,8 +224,8 @@ class DialogflowManager:
             input_context_names=input_context_names,
             output_contexts=output_contexts,
             priority=intent_data.get("priority", 500000),
-            webhook_state=getattr(dialogflow.Intent.WebhookState, 
-                                intent_data.get("webhook_state", "WEBHOOK_STATE_UNSPECIFIED"))
+            webhook_state=getattr(dialogflow.Intent.WebhookState,
+                                  intent_data.get("webhook_state", "WEBHOOK_STATE_UNSPECIFIED"))
         )
 
         try:
