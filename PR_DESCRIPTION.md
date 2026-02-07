@@ -22,12 +22,18 @@ Este PR introduz um script de automação robusto (`scripts/deploy_intents.sh`) 
 
 ## Como Testar
 1. Certifique-se de que a chave de serviço válida esteja em `key-json/`.
-2. Execute o script:
+2. O script gerencia automaticamente o ambiente virtual, mas se precisar instalar dependências manualmente:
+   ```bash
+   python3 -m venv .venv_stable
+   source .venv_stable/bin/activate
+   pip install -r requirements.txt
+   ```
+3. Execute o script de deploy:
    ```bash
    ./scripts/deploy_intents.sh
    ```
-3. Verifique o output no terminal e o arquivo `automation_report.log`.
-4. Confirme as alterações no Console do Dialogflow.
+4. Verifique o output no terminal e o arquivo `automation_report.log`.
+5. Confirme as alterações no Console do Dialogflow.
 
 ## Validação
 - [x] Script executável e testado localmente (dry-run).

@@ -1,16 +1,19 @@
+from google.auth.exceptions import DefaultCredentialsError
+from google.cloud import dialogflow_v2 as dialogflow
+from google.api_core.exceptions import (
+    AlreadyExists, GoogleAPICallError, RetryError, InvalidArgument, FailedPrecondition,
+    ServiceUnavailable, DeadlineExceeded, InternalServerError, Aborted, ResourceExhausted
+)
+from google.api_core import retry
+import json
+import logging
+import time
+from typing import List, Dict, Any, Optional
 import os
 # Fix for Python 3.14 + Protobuf compatibility issues
 # Must be set before importing ANY google library
 os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 
-from typing import List, Dict, Any, Optional
-import time
-import logging
-import json
-from google.api_core import retry
-from google.api_core.exceptions import AlreadyExists, GoogleAPICallError, RetryError
-from google.cloud import dialogflow_v2 as dialogflow
-from google.auth.exceptions import DefaultCredentialsError
 
 # Configuração de Logging detalhado
 logging.basicConfig(
@@ -33,7 +36,7 @@ class DialogflowManager:
             project_id: ID do projeto GCP.
             credentials_path: Caminho para o JSON de credenciais (opcional se usar env var).
         """
-        self.project_id = project_id
+        self.project_id = project_id.strip()
         if credentials_path:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
             logger.info(
@@ -48,7 +51,8 @@ class DialogflowManager:
         except (DefaultCredentialsError, ValueError) as e:
             logger.critical(f"FALHA DE CREDENCIAIS: {e}")
             print("\n❌ ERRO CRÍTICO DE AUTENTICAÇÃO")
-            print("O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock.")
+            print(
+                "O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock.")
             print("Para executar a automação real, você precisa de um arquivo de chave de conta de serviço VÁLIDO do Google Cloud.")
             print("1. Acesse o console do GCP > IAM & Admin > Service Accounts")
             print("2. Crie uma chave JSON para sua conta de serviço")
@@ -67,9 +71,13 @@ class DialogflowManager:
             multiplier=2.0,
             deadline=120.0,
             predicate=retry.if_exception_type(
-                GoogleAPICallError,
-                RetryError,
-                ConnectionError
+                ServiceUnavailable,
+                DeadlineExceeded,
+                InternalServerError,
+                Aborted,
+                ResourceExhausted,
+                ConnectionError,
+                RetryError
             )
         )
 
@@ -99,8 +107,7 @@ class DialogflowManager:
         """Busca ID de uma intent pelo nome."""
         try:
             intents = self.intents_client.list_intents(
-                parent=self.parent,
-                intent_view=dialogflow.IntentView.INTENT_VIEW_FULL
+                parent=self.parent
             )
             for i in intents:
                 if i.display_name == display_name:
@@ -138,7 +145,20 @@ class DialogflowManager:
             # Recuperar ID para batch update
             name = created_entity.name
 
-        except AlreadyExists:
+        except (AlreadyExists, InvalidArgument, FailedPrecondition) as e:
+            # Verifica se é erro de duplicidade (mesmo se vier como InvalidArgument ou FailedPrecondition)
+            is_already_exists = isinstance(e, AlreadyExists)
+            if not is_already_exists:
+                msg = str(e).lower()
+                if "already exists" in msg:
+                    is_already_exists = True
+
+            if not is_already_exists:
+                logger.error(
+                    f"❌ Erro de validação/precondição para entidade {display_name}: {e}")
+                self.stats["entities_failed"] += 1
+                return
+
             logger.info(
                 f"⚠️ Entidade {display_name} já existe. Iniciando atualização...")
             name = self._get_entity_type_id(display_name)
@@ -206,13 +226,15 @@ class DialogflowManager:
         # Contextos de Entrada
         input_context_names = []
         for ctx_name in intent_data.get("input_context_names", []):
-            input_context_names.append(f"{self.parent}/contexts/{ctx_name}")
+            # Formato correto: projects/<Project ID>/agent/sessions/-/contexts/<Context ID>
+            input_context_names.append(
+                f"{self.parent}/sessions/-/contexts/{ctx_name}")
 
         # Contextos de Saída
         output_contexts = []
         for ctx in intent_data.get("output_contexts", []):
             output_contexts.append(dialogflow.Context(
-                name=f"{self.parent}/contexts/{ctx['name']}",
+                name=f"{self.parent}/sessions/-/contexts/{ctx['name']}",
                 lifespan_count=ctx.get("lifespan_count", 5)
             ))
 
@@ -237,7 +259,20 @@ class DialogflowManager:
             logger.info(f"✅ Intent CRIADA: {display_name}")
             self.stats["intents_created"] += 1
 
-        except AlreadyExists:
+        except (AlreadyExists, InvalidArgument, FailedPrecondition) as e:
+            # Verifica se é erro de duplicidade
+            is_already_exists = isinstance(e, AlreadyExists)
+            if not is_already_exists:
+                msg = str(e).lower()
+                if "already exists" in msg:
+                    is_already_exists = True
+
+            if not is_already_exists:
+                logger.error(
+                    f"❌ Erro de validação para intent {display_name}: {e}")
+                self.stats["intents_failed"] += 1
+                return
+
             logger.info(
                 f"⚠️ Intent {display_name} já existe. Iniciando atualização...")
             name = self._get_intent_id(display_name)
@@ -245,7 +280,6 @@ class DialogflowManager:
                 intent.name = name
                 self.intents_client.update_intent(
                     intent=intent,
-                    intent_view=dialogflow.IntentView.INTENT_VIEW_FULL,
                     retry=self.retry_policy
                 )
                 logger.info(f"✅ Intent ATUALIZADA: {display_name}")

@@ -96,4 +96,7 @@ credentials.json
 client_secret.json
 
 # --- Documentation Rules ---
-/docs/
+# /docs/ (Removido para permitir versionamento da documentação)
+
+# --- Virtual Envs Custom ---
+.venv_stable/

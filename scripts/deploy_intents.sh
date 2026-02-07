@@ -58,15 +58,25 @@ log "Configurando variáveis de ambiente..."
 export GOOGLE_APPLICATION_CREDENTIALS="$CREDENTIALS_PATH"
 log "GOOGLE_APPLICATION_CREDENTIALS definido para: $CREDENTIALS_PATH"
 
-# Fix para Python 3.14+ (se necessário) e compatibilidade Protobuf
-export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-log "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION definido para: python"
+# Seleção do Python Interpreter
+# Prioriza venv estável (Python 3.9+) criado para evitar problemas com Python 3.14+
+if [ -f "${PROJECT_ROOT}/.venv_stable/bin/python3" ]; then
+    PYTHON_CMD="${PROJECT_ROOT}/.venv_stable/bin/python3"
+    log "Usando Python do ambiente virtual estável: $PYTHON_CMD"
+elif [ -f "${PROJECT_ROOT}/.venv/bin/python3" ]; then
+    PYTHON_CMD="${PROJECT_ROOT}/.venv/bin/python3"
+    log "Usando Python do ambiente virtual padrão: $PYTHON_CMD"
+else
+    PYTHON_CMD="python3"
+    log "⚠️ Ambiente virtual não encontrado. Usando python3 do sistema (pode causar erros em versões bleeding-edge): $(which python3)"
+fi
 
 # Carrega variáveis do .env se existir (para GCP_PROJECT_ID)
 if [ -f "${PROJECT_ROOT}/.env" ]; then
     log "Lendo configurações do arquivo .env..."
     # Tenta extrair o ID do projeto manualmente para validação no shell
-    ENV_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" "${PROJECT_ROOT}/.env" | cut -d '=' -f2)
+    # Usa tail -n 1 para pegar apenas a última ocorrência em caso de duplicatas no .env
+    ENV_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" "${PROJECT_ROOT}/.env" | cut -d '=' -f2 | tail -n 1 | tr -d '\r')
     if [ ! -z "$ENV_PROJECT_ID" ]; then
         export GCP_PROJECT_ID=$ENV_PROJECT_ID
     fi
@@ -93,7 +103,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     # Adiciona PROJECT_ROOT ao PYTHONPATH para garantir imports corretos
     export PYTHONPATH="${PROJECT_ROOT}:$PYTHONPATH"
     
-    python3 "$PYTHON_SCRIPT"
+    "$PYTHON_CMD" "$PYTHON_SCRIPT"
     EXIT_CODE=$?
     
     if [ $EXIT_CODE -eq 0 ]; then
