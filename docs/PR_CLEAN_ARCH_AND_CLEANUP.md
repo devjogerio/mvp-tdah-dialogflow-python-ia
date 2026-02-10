@@ -33,13 +33,15 @@ Reestruturar completamente o projeto para seguir os princípios da Clean Archite
 - **Cobertura**: Análise de cobertura executada para identificar áreas críticas.
 
 ## 🧪 Validação
-- [x] **Testes Automatizados**: 20 testes passaram com sucesso (`python -m pytest tests/`).
+- [x] **Testes Automatizados**: 20 testes de aplicação passaram com sucesso (`python -m pytest tests/unit`).
 - [x] **Análise Estática**: `flake8` e `vulture` executados.
 - [x] **Deploy Local**: Entrypoint `lambda_function.py` verificado.
 
+> **Nota**: Os testes de infraestrutura (`infra/tests/test_infra_stack.py`) estão falhando devido a uma incompatibilidade de ambiente local com o runtime JSII/Node.js (`Cannot find module 'jsonschema'`). Isso não afeta a lógica da aplicação em `src/` e deve ser resolvido no ambiente de CI/CD ou com atualização do ambiente de desenvolvimento.
+
 ## 📸 Evidências
-- Logs de teste limpos.
-- Estrutura de diretórios organizada.
+- Logs de teste limpos (Camada de Aplicação).
+- Estrutura de diretórios organizada seguindo Clean Architecture.
 
 ## 🔗 Próximos Passos
 - Implementar persistência real de Sessão (DynamoDB).
