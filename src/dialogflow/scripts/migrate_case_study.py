@@ -1,11 +1,13 @@
 import json
-import os
 import logging
+import os
+
 from src.dialogflow.parsers.markdown_parser import CaseStudyParser
 
 # Configuração de Logs
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger("MigrationScript")
 
 CONFIG_PATH = "src/dialogflow/data/initial_config.json"
@@ -15,12 +17,12 @@ MARKDOWN_PATH = "docs/esudo-de-caso.md"
 def load_config(path):
     if not os.path.exists(path):
         return {"intents": [], "entities": []}
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_config(path, data):
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     logger.info(f"Configuração salva em {path}")
 
@@ -42,8 +44,7 @@ def merge_data(existing, new_data):
     Usa 'display_name' como chave única.
     """
     # Merge Intents
-    existing_intents = {i["display_name"]
-        : i for i in existing.get("intents", [])}
+    existing_intents = {i["display_name"]: i for i in existing.get("intents", [])}
     for intent in new_data.get("intents", []):
         name = intent["display_name"]
         if name in existing_intents:
@@ -54,15 +55,15 @@ def merge_data(existing, new_data):
             existing_intents[name] = intent
 
     # Merge Entities
-    existing_entities = {e["display_name"]
-        : e for e in existing.get("entities", [])}
+    existing_entities = {e["display_name"]: e for e in existing.get("entities", [])}
     for entity in new_data.get("entities", []):
         name = entity["display_name"]
         if name in existing_entities:
             logger.info(f"Atualizando Entity: {name}")
             # Merge entries for entities
             current_entries = {
-                entry["value"]: entry for entry in existing_entities[name]["entries"]}
+                entry["value"]: entry for entry in existing_entities[name]["entries"]
+            }
             for entry in entity["entries"]:
                 current_entries[entry["value"]] = entry
             existing_entities[name]["entries"] = list(current_entries.values())
@@ -72,7 +73,7 @@ def merge_data(existing, new_data):
 
     return {
         "intents": list(existing_intents.values()),
-        "entities": list(existing_entities.values())
+        "entities": list(existing_entities.values()),
     }
 
 

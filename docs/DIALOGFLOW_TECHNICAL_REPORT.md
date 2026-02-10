@@ -1,7 +1,7 @@
 # Relatório Técnico: Ecossistema Dialogflow & Integração AWS Lambda
 
-**Data:** 06/02/2026  
-**Autor:** Rogério Assunção  
+**Data:** 06/02/2026
+**Autor:** Rogério Assunção
 **Status:** Implementado e Validado
 
 ---

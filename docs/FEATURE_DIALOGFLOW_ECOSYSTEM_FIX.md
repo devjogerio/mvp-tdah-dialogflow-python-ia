@@ -1,7 +1,7 @@
 # Documentação da Feature: Dialogflow Ecosystem Fix
 
-**Versão da Documentação:** 1.0.0  
-**Versão do Projeto:** v0.2.0  
+**Versão da Documentação:** 1.0.0
+**Versão do Projeto:** v0.2.0
 **Data:** 06/02/2026
 
 ---

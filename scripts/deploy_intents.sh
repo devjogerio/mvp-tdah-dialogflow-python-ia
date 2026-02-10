@@ -88,14 +88,14 @@ SUCCESS=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     log "Iniciando sincronização com Dialogflow (Tentativa $((RETRY_COUNT+1))/$MAX_RETRIES)..."
-    
+
     # Executa o script Python
     # Adiciona PROJECT_ROOT ao PYTHONPATH para garantir imports corretos
     export PYTHONPATH="${PROJECT_ROOT}:$PYTHONPATH"
-    
+
     python3 "$PYTHON_SCRIPT"
     EXIT_CODE=$?
-    
+
     if [ $EXIT_CODE -eq 0 ]; then
         log "✅ Sincronização concluída com sucesso!"
         SUCCESS=1
@@ -103,7 +103,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     else
         warn "❌ Falha na execução (Código de Saída: $EXIT_CODE)."
         RETRY_COUNT=$((RETRY_COUNT+1))
-        
+
         if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
             WAIT_TIME=$((RETRY_COUNT * 5))
             log "Aguardando $WAIT_TIME segundos antes da próxima tentativa..."

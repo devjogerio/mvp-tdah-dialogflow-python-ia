@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import sys
 import json
 import re
+import sys
 from datetime import datetime
 
 """
@@ -9,11 +9,7 @@ Script de Gerenciamento de Versão (Semantic Versioning).
 Responsável por atualizar version.txt, package.json e CHANGELOG.md.
 """
 
-FILES = {
-    "txt": "version.txt",
-    "json": "package.json",
-    "changelog": "docs/CHANGELOG.md"
-}
+FILES = {"txt": "version.txt", "json": "package.json", "changelog": "docs/CHANGELOG.md"}
 
 
 def get_current_version():
@@ -25,7 +21,7 @@ def get_current_version():
 
 
 def bump_version(current_version, part):
-    major, minor, patch = map(int, current_version.split('.'))
+    major, minor, patch = map(int, current_version.split("."))
     if part == "major":
         major += 1
         minor = 0
@@ -53,7 +49,7 @@ def update_files(new_version):
         data["version"] = new_version
         with open(FILES["json"], "w") as f:
             json.dump(data, f, indent=2)
-            f.write('\n')  # Add newline at end of file
+            f.write("\n")  # Add newline at end of file
     except FileNotFoundError:
         pass
 
@@ -64,7 +60,10 @@ def update_files(new_version):
 def update_changelog(new_version):
     date_str = datetime.now().strftime("%Y-%m-%d")
     header_pattern = r"## \[Unreleased\]"
-    new_header = f"## [Unreleased]\n\n### Added\n- \n\n### Changed\n- \n\n### Deprecated\n- \n\n### Removed\n- \n\n### Fixed\n- \n\n### Security\n- \n\n## [{new_version}] - {date_str}"
+    new_header = (
+        f"## [Unreleased]\n\n### Added\n- \n\n### Changed\n- \n\n### Deprecated\n- \n\n### Removed\n- \n\n"
+        f"### Fixed\n- \n\n### Security\n- \n\n## [{new_version}] - {date_str}"
+    )
 
     try:
         with open(FILES["changelog"], "r") as f:

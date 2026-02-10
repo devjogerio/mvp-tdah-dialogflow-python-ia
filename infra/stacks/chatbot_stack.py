@@ -1,10 +1,8 @@
-from aws_cdk import (
-    Stack,
-)
+from aws_cdk import Stack
 from constructs import Construct
-from resources.storage import StorageConstruct
-from resources.search import SearchConstruct
 from resources.compute import ComputeConstruct
+from resources.search import SearchConstruct
+from resources.storage import StorageConstruct
 
 
 class ChatbotStack(Stack):
@@ -18,13 +16,10 @@ class ChatbotStack(Stack):
         lambda_name = "tdah-chatbot-handler"
 
         # Storage
-        self.storage = StorageConstruct(
-            self, "Storage", bucket_name=bucket_name)
+        self.storage = StorageConstruct(self, "Storage", bucket_name=bucket_name)
 
         # Search
-        self.search = SearchConstruct(
-            self, "Search", collection_name=collection_name)
+        self.search = SearchConstruct(self, "Search", collection_name=collection_name)
 
         # Compute
-        self.compute = ComputeConstruct(
-            self, "Compute", lambda_name=lambda_name)
+        self.compute = ComputeConstruct(self, "Compute", lambda_name=lambda_name)

@@ -1,7 +1,7 @@
 # Relatório de Análise Técnica: MVP TDAH Dialogflow Python
 
-**Data:** 07/02/2026  
-**Versão do Documento:** 1.0  
+**Data:** 07/02/2026
+**Versão do Documento:** 1.0
 **Autor:** Assistente de Arquitetura de Software (Trae AI)
 
 ---
