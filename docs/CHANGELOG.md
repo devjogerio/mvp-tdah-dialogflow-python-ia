@@ -24,16 +24,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Atualização do `DialogflowManager` para processar e sincronizar contextos de entrada e saída definidos no JSON.
 
 ### Deprecated
-- 
+-
 
 ### Removed
-- 
+-
 
 ### Fixed
-- 
+-
 
 ### Security
-- 
+-
 
 ## [0.2.0] - 2026-02-06
 
