@@ -1,9 +1,12 @@
-import os
 import logging
+import os
+
 from openai import OpenAI
-from .base import LLMProvider
+
+from src.domain.interfaces.repositories import LLMProvider
 
 logger = logging.getLogger(__name__)
+
 
 class OpenAILLM(LLMProvider):
     """
@@ -17,7 +20,7 @@ class OpenAILLM(LLMProvider):
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             logger.warning("OPENAI_API_KEY não configurada.")
-            
+
         self.client = OpenAI(api_key=api_key)
         self.model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
@@ -45,10 +48,10 @@ Regras de Resposta:
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ],
                 temperature=0.2,
-                max_tokens=512
+                max_tokens=512,
             )
 
             return response.choices[0].message.content.strip()

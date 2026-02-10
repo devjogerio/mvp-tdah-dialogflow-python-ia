@@ -1,8 +1,9 @@
-from typing import Dict, Any, Tuple
 import json
 import logging
+from typing import Any, Dict, Tuple
 
 logger = logging.getLogger(__name__)
+
 
 class DialogflowAdapter:
     """
@@ -23,7 +24,7 @@ class DialogflowAdapter:
         """
         try:
             body = event
-            
+
             # Se vier via API Gateway Proxy, o body é uma string dentro de 'body'
             if "body" in event and isinstance(event["body"], str):
                 body = json.loads(event["body"])
@@ -36,11 +37,13 @@ class DialogflowAdapter:
                 query_result = body.get("queryResult", {})
                 user_message = query_result.get("queryText", "")
                 parameters = query_result.get("parameters", {})
-                
+
                 # Session path ex: projects/project-id/agent/sessions/SESSION_ID
                 full_session = body.get("session", "")
-                session_id = full_session.split("/")[-1] if "/" in full_session else full_session
-                
+                session_id = (
+                    full_session.split("/")[-1] if "/" in full_session else full_session
+                )
+
                 return user_message, session_id, parameters
 
             # 2. Detecção de Payload Genérico (Teste Local / API Direta)
@@ -66,16 +69,8 @@ class DialogflowAdapter:
             # Formato padrão Dialogflow WebhookResponse
             return {
                 "fulfillmentText": text,
-                "fulfillmentMessages": [
-                    {
-                        "text": {
-                            "text": [text]
-                        }
-                    }
-                ]
+                "fulfillmentMessages": [{"text": {"text": [text]}}],
             }
         else:
             # Formato API padrão
-            return {
-                "response": text
-            }
+            return {"response": text}

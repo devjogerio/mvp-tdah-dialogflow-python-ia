@@ -1,10 +1,13 @@
-import boto3
 import json
-import os
 import logging
-from .base import LLMProvider
+import os
+
+import boto3
+
+from src.domain.interfaces.repositories import LLMProvider
 
 logger = logging.getLogger(__name__)
+
 
 class BedrockLLM(LLMProvider):
     """
@@ -16,8 +19,7 @@ class BedrockLLM(LLMProvider):
         Inicializa o cliente Bedrock.
         """
         self.client = boto3.client(
-            service_name="bedrock-runtime",
-            region_name=region_name
+            service_name="bedrock-runtime", region_name=region_name
         )
         self.model_id = os.getenv("BEDROCK_MODEL_ID", "meta.llama3-8b-instruct-v1:0")
 
@@ -50,17 +52,16 @@ Contexto de Referência:
 <|eot_id|><|start_header_id|>assistant<|end_header_id|>
 """
 
-            body = json.dumps({
-                "prompt": formatted_prompt,
-                "max_gen_len": 512,
-                "temperature": 0.2,
-                "top_p": 0.9,
-            })
-
-            response = self.client.invoke_model(
-                modelId=self.model_id,
-                body=body
+            body = json.dumps(
+                {
+                    "prompt": formatted_prompt,
+                    "max_gen_len": 512,
+                    "temperature": 0.2,
+                    "top_p": 0.9,
+                }
             )
+
+            response = self.client.invoke_model(modelId=self.model_id, body=body)
 
             response_body = json.loads(response.get("body").read())
             generation = response_body.get("generation", "")

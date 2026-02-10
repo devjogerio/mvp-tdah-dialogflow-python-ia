@@ -1,9 +1,12 @@
-import google.generativeai as genai
-import os
 import logging
-from .base import LLMProvider
+import os
+
+import google.generativeai as genai
+
+from src.domain.interfaces.repositories import LLMProvider
 
 logger = logging.getLogger(__name__)
+
 
 class GeminiLLM(LLMProvider):
     """
@@ -17,9 +20,9 @@ class GeminiLLM(LLMProvider):
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             logger.warning("GEMINI_API_KEY não configurada.")
-        
+
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel("gemini-pro")
 
     def invoke(self, prompt: str, context: str = "") -> str:
         """
@@ -44,7 +47,7 @@ Regras de Resposta:
 Pergunta do Usuário:
 {prompt}
 """
-            
+
             response = self.model.generate_content(formatted_prompt)
             return response.text.strip()
 

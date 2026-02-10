@@ -1,12 +1,14 @@
-from google.auth.exceptions import DefaultCredentialsError
-from google.cloud import dialogflow_v2 as dialogflow
-from google.api_core.exceptions import AlreadyExists, GoogleAPICallError, RetryError
-from google.api_core import retry
 import json
 import logging
-import time
-from typing import List, Dict, Any, Optional
 import os
+import time
+from typing import Any, Dict, List, Optional
+
+from google.api_core import retry
+from google.api_core.exceptions import AlreadyExists, GoogleAPICallError, RetryError
+from google.auth.exceptions import DefaultCredentialsError
+from google.cloud import dialogflow_v2 as dialogflow
+
 # Fix for Python 3.14 + Protobuf compatibility issues
 # Must be set before importing ANY google library
 os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
@@ -15,11 +17,8 @@ os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 # Configuração de Logging detalhado
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler("automation_report.log")
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler("automation_report.log")],
 )
 logger = logging.getLogger("DialogflowAutomation")
 
@@ -36,29 +35,32 @@ class DialogflowManager:
         self.project_id = project_id
         if credentials_path:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
-            logger.info(
-                f"Credenciais configuradas a partir de: {credentials_path}")
+            logger.info(f"Credenciais configuradas a partir de: {credentials_path}")
 
         try:
             self.intents_client = dialogflow.IntentsClient()
             self.entity_types_client = dialogflow.EntityTypesClient()
             self.parent = f"projects/{project_id}/agent"
-            logger.info(
-                f"Cliente Dialogflow inicializado para projeto: {project_id}")
+            logger.info(f"Cliente Dialogflow inicializado para projeto: {project_id}")
         except (DefaultCredentialsError, ValueError) as e:
             logger.critical(f"FALHA DE CREDENCIAIS: {e}")
             print("\n❌ ERRO CRÍTICO DE AUTENTICAÇÃO")
             print(
-                "O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock.")
-            print("Para executar a automação real, você precisa de um arquivo de chave de conta de serviço VÁLIDO do Google Cloud.")
+                "O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock."
+            )
+            print(
+                "Para executar a automação real, você precisa de um arquivo de "
+                "chave de conta de serviço VÁLIDO do Google Cloud."
+            )
             print("1. Acesse o console do GCP > IAM & Admin > Service Accounts")
             print("2. Crie uma chave JSON para sua conta de serviço")
             print("3. Salve como 'key-json/credentials.json' (ou atualize seu .env)")
-            print("4. Configure GOOGLE_APPLICATION_CREDENTIALS para o caminho correto.\n")
+            print(
+                "4. Configure GOOGLE_APPLICATION_CREDENTIALS para o caminho correto.\n"
+            )
             raise e
         except Exception as e:
-            logger.critical(
-                f"Falha na autenticação ou inicialização do cliente: {e}")
+            logger.critical(f"Falha na autenticação ou inicialização do cliente: {e}")
             raise
 
         # Configuração de Retry Padrão (Exponencial Backoff)
@@ -68,10 +70,8 @@ class DialogflowManager:
             multiplier=2.0,
             deadline=120.0,
             predicate=retry.if_exception_type(
-                GoogleAPICallError,
-                RetryError,
-                ConnectionError
-            )
+                GoogleAPICallError, RetryError, ConnectionError
+            ),
         )
 
         self.stats = {
@@ -80,7 +80,7 @@ class DialogflowManager:
             "intents_failed": 0,
             "entities_created": 0,
             "entities_updated": 0,
-            "entities_failed": 0
+            "entities_failed": 0,
         }
 
     def _get_entity_type_id(self, display_name: str) -> Optional[str]:
@@ -88,7 +88,8 @@ class DialogflowManager:
         try:
             # Em produção, usar filtro seria melhor, mas listagem é segura para volumes menores
             entity_types = self.entity_types_client.list_entity_types(
-                parent=self.parent)
+                parent=self.parent
+            )
             for et in entity_types:
                 if et.display_name == display_name:
                     return et.name
@@ -100,8 +101,7 @@ class DialogflowManager:
         """Busca ID de uma intent pelo nome."""
         try:
             intents = self.intents_client.list_intents(
-                parent=self.parent,
-                intent_view=dialogflow.IntentView.INTENT_VIEW_FULL
+                parent=self.parent, intent_view=dialogflow.IntentView.INTENT_VIEW_FULL
             )
             for i in intents:
                 if i.display_name == display_name:
@@ -116,22 +116,20 @@ class DialogflowManager:
 
         entity_type = dialogflow.EntityType(
             display_name=display_name,
-            kind=getattr(dialogflow.EntityType.Kind, kind,
-                         dialogflow.EntityType.Kind.KIND_MAP)
+            kind=getattr(
+                dialogflow.EntityType.Kind, kind, dialogflow.EntityType.Kind.KIND_MAP
+            ),
         )
 
         batch_entries = [
-            dialogflow.EntityType.Entity(
-                value=e['value'], synonyms=e['synonyms'])
+            dialogflow.EntityType.Entity(value=e["value"], synonyms=e["synonyms"])
             for e in entries
         ]
 
         try:
             # Tentativa de Criação
             created_entity = self.entity_types_client.create_entity_type(
-                parent=self.parent,
-                entity_type=entity_type,
-                retry=self.retry_policy
+                parent=self.parent, entity_type=entity_type, retry=self.retry_policy
             )
             logger.info(f"✅ Entidade CRIADA: {display_name}")
             self.stats["entities_created"] += 1
@@ -141,25 +139,25 @@ class DialogflowManager:
 
         except AlreadyExists:
             logger.info(
-                f"⚠️ Entidade {display_name} já existe. Iniciando atualização...")
+                f"⚠️ Entidade {display_name} já existe. Iniciando atualização..."
+            )
             name = self._get_entity_type_id(display_name)
             if name:
                 entity_type.name = name
                 self.entity_types_client.update_entity_type(
-                    entity_type=entity_type,
-                    retry=self.retry_policy
+                    entity_type=entity_type, retry=self.retry_policy
                 )
                 logger.info(f"✅ Entidade ATUALIZADA: {display_name}")
                 self.stats["entities_updated"] += 1
             else:
                 logger.error(
-                    f"❌ Erro de integridade: {display_name} existe mas não foi encontrada.")
+                    f"❌ Erro de integridade: {display_name} existe mas não foi encontrada."
+                )
                 self.stats["entities_failed"] += 1
                 return
 
         except Exception as e:
-            logger.error(
-                f"❌ Falha crítica ao processar entidade {display_name}: {e}")
+            logger.error(f"❌ Falha crítica ao processar entidade {display_name}: {e}")
             self.stats["entities_failed"] += 1
             return
 
@@ -167,14 +165,13 @@ class DialogflowManager:
         if name:
             try:
                 self.entity_types_client.batch_update_entities(
-                    parent=name,
-                    entities=batch_entries,
-                    retry=self.retry_policy
+                    parent=name, entities=batch_entries, retry=self.retry_policy
                 )
                 logger.info(f"   ↳ Entradas sincronizadas para {display_name}")
             except Exception as e:
                 logger.error(
-                    f"   ❌ Falha ao sincronizar entradas para {display_name}: {e}")
+                    f"   ❌ Falha ao sincronizar entradas para {display_name}: {e}"
+                )
 
     def create_intent(self, intent_data: Dict[str, Any]):
         """Cria ou atualiza Intent com retry, validação e suporte a parâmetros."""
@@ -185,8 +182,7 @@ class DialogflowManager:
         training_phrases = []
         for phrase in intent_data.get("training_phrases", []):
             part = dialogflow.Intent.TrainingPhrase.Part(text=phrase)
-            training_phrases.append(
-                dialogflow.Intent.TrainingPhrase(parts=[part]))
+            training_phrases.append(dialogflow.Intent.TrainingPhrase(parts=[part]))
 
         messages = []
         for msg in intent_data.get("messages", []):
@@ -197,12 +193,14 @@ class DialogflowManager:
         # Construção de Parâmetros
         parameters = []
         for param in intent_data.get("parameters", []):
-            parameters.append(dialogflow.Intent.Parameter(
-                display_name=param["display_name"],
-                entity_type_display_name=param["entity_type_display_name"],
-                mandatory=param.get("mandatory", False),
-                prompts=param.get("prompts", [])
-            ))
+            parameters.append(
+                dialogflow.Intent.Parameter(
+                    display_name=param["display_name"],
+                    entity_type_display_name=param["entity_type_display_name"],
+                    mandatory=param.get("mandatory", False),
+                    prompts=param.get("prompts", []),
+                )
+            )
 
         # Contextos de Entrada
         input_context_names = []
@@ -212,10 +210,12 @@ class DialogflowManager:
         # Contextos de Saída
         output_contexts = []
         for ctx in intent_data.get("output_contexts", []):
-            output_contexts.append(dialogflow.Context(
-                name=f"{self.parent}/contexts/{ctx['name']}",
-                lifespan_count=ctx.get("lifespan_count", 5)
-            ))
+            output_contexts.append(
+                dialogflow.Context(
+                    name=f"{self.parent}/contexts/{ctx['name']}",
+                    lifespan_count=ctx.get("lifespan_count", 5),
+                )
+            )
 
         intent = dialogflow.Intent(
             display_name=display_name,
@@ -225,40 +225,39 @@ class DialogflowManager:
             input_context_names=input_context_names,
             output_contexts=output_contexts,
             priority=intent_data.get("priority", 500000),
-            webhook_state=getattr(dialogflow.Intent.WebhookState,
-                                  intent_data.get("webhook_state", "WEBHOOK_STATE_UNSPECIFIED"))
+            webhook_state=getattr(
+                dialogflow.Intent.WebhookState,
+                intent_data.get("webhook_state", "WEBHOOK_STATE_UNSPECIFIED"),
+            ),
         )
 
         try:
             self.intents_client.create_intent(
-                parent=self.parent,
-                intent=intent,
-                retry=self.retry_policy
+                parent=self.parent, intent=intent, retry=self.retry_policy
             )
             logger.info(f"✅ Intent CRIADA: {display_name}")
             self.stats["intents_created"] += 1
 
         except AlreadyExists:
-            logger.info(
-                f"⚠️ Intent {display_name} já existe. Iniciando atualização...")
+            logger.info(f"⚠️ Intent {display_name} já existe. Iniciando atualização...")
             name = self._get_intent_id(display_name)
             if name:
                 intent.name = name
                 self.intents_client.update_intent(
                     intent=intent,
                     intent_view=dialogflow.IntentView.INTENT_VIEW_FULL,
-                    retry=self.retry_policy
+                    retry=self.retry_policy,
                 )
                 logger.info(f"✅ Intent ATUALIZADA: {display_name}")
                 self.stats["intents_updated"] += 1
             else:
                 logger.error(
-                    f"❌ Erro de integridade: {display_name} existe mas não foi encontrada.")
+                    f"❌ Erro de integridade: {display_name} existe mas não foi encontrada."
+                )
                 self.stats["intents_failed"] += 1
 
         except Exception as e:
-            logger.error(
-                f"❌ Falha crítica ao processar intent {display_name}: {e}")
+            logger.error(f"❌ Falha crítica ao processar intent {display_name}: {e}")
             self.stats["intents_failed"] += 1
 
     def sync_from_json(self, json_path: str):
@@ -267,20 +266,17 @@ class DialogflowManager:
         start_time = time.time()
 
         try:
-            with open(json_path, 'r', encoding='utf-8') as f:
+            with open(json_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception as e:
-            logger.critical(
-                f"Erro ao ler arquivo de configuração {json_path}: {e}")
+            logger.critical(f"Erro ao ler arquivo de configuração {json_path}: {e}")
             return
 
         # 1. Sync Entities (Dependência para Intents)
         logger.info("--- Fase 1: Sincronização de Entidades ---")
         for entity in data.get("entities", []):
             self.create_entity_type(
-                entity["display_name"],
-                entity["kind"],
-                entity["entries"]
+                entity["display_name"], entity["kind"], entity["entries"]
             )
 
         # 2. Sync Intents
@@ -298,12 +294,12 @@ class DialogflowManager:
         RELATÓRIO FINAL DE AUTOMAÇÃO
         =============================================
         Tempo Total: {duration:.2f} segundos
-        
+
         RESUMO DE INTENTS:
           - Criadas:   {self.stats['intents_created']}
           - Atualizadas: {self.stats['intents_updated']}
           - Falhas:    {self.stats['intents_failed']}
-        
+
         RESUMO DE ENTIDADES:
           - Criadas:   {self.stats['entities_created']}
           - Atualizadas: {self.stats['entities_updated']}
@@ -324,6 +320,7 @@ if __name__ == "__main__":
     # Load environment variables
     try:
         from dotenv import load_dotenv
+
         load_dotenv()
     except ImportError:
         pass
@@ -337,13 +334,13 @@ if __name__ == "__main__":
     # Verifica credenciais
     if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
         logger.warning(
-            "AVISO: GOOGLE_APPLICATION_CREDENTIALS não definido. Tentando credenciais default...")
+            "AVISO: GOOGLE_APPLICATION_CREDENTIALS não definido. Tentando credenciais default..."
+        )
 
     manager = DialogflowManager(project_id)
 
     # Caminho do Config
-    config_path = os.path.join(os.path.dirname(
-        __file__), "data", "initial_config.json")
+    config_path = os.path.join(os.path.dirname(__file__), "data", "initial_config.json")
 
     if os.path.exists(config_path):
         manager.sync_from_json(config_path)
