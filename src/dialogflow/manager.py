@@ -310,11 +310,6 @@ class DialogflowManager:
         logger.info(report)
         print(report)
 
-    def export_to_json(self, output_path: str):
-        """Exporta a configuração atual para JSON (Backup)."""
-        # ... implementation maintained or simplified ...
-        pass
-
 
 if __name__ == "__main__":
     # Load environment variables
