@@ -25,6 +25,7 @@ MANIFEST
 .env.local
 .env.*.local
 .venv
+.venv_stable/
 env/
 venv/
 ENV/

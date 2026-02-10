@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import json
+import logging
 import subprocess
 import sys
-import logging
 import time
-import json
 from datetime import datetime
 
 """
@@ -15,11 +15,8 @@ Realiza testes, validação de infra e deploy simulado.
 # Configuração de Logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler('deploy.log')
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler("deploy.log")],
 )
 logger = logging.getLogger(__name__)
 
@@ -41,7 +38,7 @@ class DeployManager:
                 cwd=cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
             logger.info(f"Saída: {result.stdout.strip()}")
             status = "SUCCESS"
@@ -54,7 +51,7 @@ class DeployManager:
                 "status": status,
                 "duration": f"{duration:.2f}s",
                 "timestamp": datetime.now().isoformat(),
-                "error": str(e)
+                "error": str(e),
             }
             if not ignore_errors:
                 raise e
@@ -63,10 +60,9 @@ class DeployManager:
         self.steps_status[step_name] = {
             "status": status,
             "duration": f"{duration:.2f}s",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-        logger.info(
-            f"<<< Etapa {step_name} concluída ({status}) em {duration:.2f}s\n")
+        logger.info(f"<<< Etapa {step_name} concluída ({status}) em {duration:.2f}s\n")
 
     def validate_requirements(self):
         self.run_step("Check Python", "python3 --version")
@@ -76,28 +72,31 @@ class DeployManager:
         except subprocess.CalledProcessError:
             self.has_terraform = False
             logger.warning(
-                "Terraform não encontrado. Etapas de infraestrutura serão puladas.")
+                "Terraform não encontrado. Etapas de infraestrutura serão puladas."
+            )
 
     def run_tests(self):
         self.run_step("Unit Tests", "python3 -m pytest tests/", cwd=None)
 
     def validate_infra(self):
-        if not getattr(self, 'has_terraform', False):
-            logger.info(
-                "Pulando validação de infra (Terraform não detectado).")
+        if not getattr(self, "has_terraform", False):
+            logger.info("Pulando validação de infra (Terraform não detectado).")
             self.steps_status["Terraform Init"] = {
-                "status": "SKIPPED", "duration": "0s"}
+                "status": "SKIPPED",
+                "duration": "0s",
+            }
             self.steps_status["Terraform Validate"] = {
-                "status": "SKIPPED", "duration": "0s"}
+                "status": "SKIPPED",
+                "duration": "0s",
+            }
             return
 
         # Verifica se o diretório infra existe e se o terraform está instalado
-        self.run_step("Terraform Init",
-                      "terraform init -backend=false", cwd="infra")
+        self.run_step("Terraform Init", "terraform init -backend=false", cwd="infra")
         self.run_step("Terraform Validate", "terraform validate", cwd="infra")
 
     def deploy(self):
-        if self.env == 'prod':
+        if self.env == "prod":
             logger.warning("!!! INICIANDO DEPLOY EM PRODUÇÃO !!!")
             time.sleep(2)  # Pausa dramática
 
@@ -107,22 +106,24 @@ class DeployManager:
 
     def generate_report(self):
         report_file = f"deploy_report_{self.env}_{int(time.time())}.json"
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             json.dump(self.steps_status, f, indent=2)
         logger.info(f"Relatório gerado em: {report_file}")
 
         print("\n=== RESUMO DO PROCESSO ===")
         for step, data in self.steps_status.items():
-            icon = "✅" if data['status'] == "SUCCESS" else "❌"
+            icon = "✅" if data["status"] == "SUCCESS" else "❌"
             print(f"{icon} {step}: {data['status']} ({data['duration']})")
 
 
 def main():
     parser = argparse.ArgumentParser(description="TDAH Chatbot Deploy Manager")
     parser.add_argument(
-        "--env", choices=['dev', 'prod'], default='dev', help="Ambiente alvo")
-    parser.add_argument("--skip-tests", action='store_true',
-                        help="Pular testes unitários")
+        "--env", choices=["dev", "prod"], default="dev", help="Ambiente alvo"
+    )
+    parser.add_argument(
+        "--skip-tests", action="store_true", help="Pular testes unitários"
+    )
 
     args = parser.parse_args()
 
