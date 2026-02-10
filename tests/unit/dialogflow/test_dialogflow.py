@@ -1,5 +1,7 @@
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import MagicMock, patch
+
 from src.dialogflow.manager import DialogflowManager
 
 
@@ -27,7 +29,7 @@ def test_create_intent(mock_dialogflow):
     intent_data = {
         "display_name": "Test Intent",
         "training_phrases": ["Hello"],
-        "messages": [{"text": ["Hi"]}]
+        "messages": [{"text": ["Hi"]}],
     }
 
     manager.create_intent(intent_data)
@@ -35,14 +37,14 @@ def test_create_intent(mock_dialogflow):
     # Verify Intent constructor was called correctly
     mock_dialogflow.Intent.assert_called_once()
     intent_ctor_args = mock_dialogflow.Intent.call_args
-    assert intent_ctor_args[1]['display_name'] == "Test Intent"
+    assert intent_ctor_args[1]["display_name"] == "Test Intent"
 
     # Verify client create call
     mock_intents_client.create_intent.assert_called_once()
     call_args = mock_intents_client.create_intent.call_args
-    assert call_args[1]['parent'] == "projects/test-project/agent"
+    assert call_args[1]["parent"] == "projects/test-project/agent"
     # The intent passed to create_intent should be the return value of the constructor
-    assert call_args[1]['intent'] == mock_dialogflow.Intent.return_value
+    assert call_args[1]["intent"] == mock_dialogflow.Intent.return_value
 
 
 def test_create_entity(mock_dialogflow):
@@ -50,10 +52,13 @@ def test_create_entity(mock_dialogflow):
     mock_entity_client = manager.entity_types_client
 
     # Mock response with name for batch_create calls
-    mock_entity_client.create_entity_type.return_value.name = "projects/test/agent/entityTypes/123"
+    mock_entity_client.create_entity_type.return_value.name = (
+        "projects/test/agent/entityTypes/123"
+    )
 
-    manager.create_entity_type("Emotion", "KIND_MAP", [
-                               {"value": "happy", "synonyms": ["joy"]}])
+    manager.create_entity_type(
+        "Emotion", "KIND_MAP", [{"value": "happy", "synonyms": ["joy"]}]
+    )
 
     mock_entity_client.create_entity_type.assert_called_once()
     mock_entity_client.batch_update_entities.assert_called_once()
