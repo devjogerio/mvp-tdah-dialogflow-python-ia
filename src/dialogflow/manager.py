@@ -1,16 +1,16 @@
+from google.auth.exceptions import DefaultCredentialsError
+from google.cloud import dialogflow_v2 as dialogflow
+from google.api_core.exceptions import AlreadyExists, GoogleAPICallError, RetryError
+from google.api_core import retry
+import json
+import logging
+import time
+from typing import List, Dict, Any, Optional
 import os
 # Fix for Python 3.14 + Protobuf compatibility issues
 # Must be set before importing ANY google library
 os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 
-from typing import List, Dict, Any, Optional
-import time
-import logging
-import json
-from google.api_core import retry
-from google.api_core.exceptions import AlreadyExists, GoogleAPICallError, RetryError
-from google.cloud import dialogflow_v2 as dialogflow
-from google.auth.exceptions import DefaultCredentialsError
 
 # Configuração de Logging detalhado
 logging.basicConfig(
@@ -48,7 +48,8 @@ class DialogflowManager:
         except (DefaultCredentialsError, ValueError) as e:
             logger.critical(f"FALHA DE CREDENCIAIS: {e}")
             print("\n❌ ERRO CRÍTICO DE AUTENTICAÇÃO")
-            print("O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock.")
+            print(
+                "O arquivo de credenciais fornecido (credentials.json) parece ser inválido ou um Mock.")
             print("Para executar a automação real, você precisa de um arquivo de chave de conta de serviço VÁLIDO do Google Cloud.")
             print("1. Acesse o console do GCP > IAM & Admin > Service Accounts")
             print("2. Crie uma chave JSON para sua conta de serviço")
